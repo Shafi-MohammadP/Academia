@@ -1,4 +1,5 @@
 import React from "react";
+import toast from "react-hot-toast";
 import {
   Navbar,
   MobileNav,
@@ -6,17 +7,33 @@ import {
   Button,
   IconButton,
 } from "@material-tailwind/react";
-import { Link, NavLink } from "react-router-dom";
-
+import { Link, NavLink, useNavigate } from "react-router-dom";
+import { useSelector } from "react-redux";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faUser } from "@fortawesome/free-solid-svg-icons";
+import { useDispatch } from "react-redux";
+import { resetState } from "../../redux/User";
+import logo from "../../assets/Company_Logo.png";
 export function TutorStickyNavbar() {
+  const navigate = useNavigate();
+  const dispatch = useDispatch();
   const [openNav, setOpenNav] = React.useState(false);
-
+  const tutor = useSelector((state) => {
+    if (state.user.userInfo.role === "tutor") return state.user.userInfo;
+  });
   React.useEffect(() => {
     window.addEventListener(
       "resize",
       () => window.innerWidth >= 960 && setOpenNav(false)
     );
   }, []);
+  const LogoutUser = () => {
+    localStorage.removeItem("authToken");
+    console.log("hlo..........");
+    dispatch(resetState());
+    navigate("/Login");
+    toast.success("Logout Success");
+  };
 
   const navList = (
     <ul className="mt-2 mb-4 flex flex-col gap-2 lg:mb-0 lg:mt-0 lg:flex-row lg:items-center lg:gap-6">
@@ -72,7 +89,7 @@ export function TutorStickyNavbar() {
             href="#"
             className="mr-4 cursor-pointer py-1.5 font-medium"
           >
-            Tutor Navbar
+            <img src={logo} alt="" className="h-20 px-10" />
           </Typography>
           <div className="flex items-center gap-4">
             <div className="mr-4 hidden lg:block">{navList}</div>
@@ -80,15 +97,21 @@ export function TutorStickyNavbar() {
               {/* <Link to={"/login"} className="hidden lg:inline-block">
                 Log In
               </Link> */}
-              <NavLink to={"/login"}>
-                <Button
-                  variant="gradient"
-                  size="sm"
-                  className="hidden lg:inline-block"
-                >
-                  <span>Sign in</span>
+              {tutor ? (
+                <Button onClick={LogoutUser} className="bg-[#051339] ">
+                  <FontAwesomeIcon icon={faUser} className="w-12 h-6" />
                 </Button>
-              </NavLink>
+              ) : (
+                <NavLink to={"/Login"}>
+                  <Button
+                    variant="gradient"
+                    size="sm"
+                    className="hidden lg:inline-block"
+                  >
+                    <span>Sign in</span>
+                  </Button>
+                </NavLink>
+              )}
             </div>
             <IconButton
               variant="text"

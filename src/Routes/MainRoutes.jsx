@@ -8,6 +8,7 @@ import CommonLogin from "../Components/common/commonLogin";
 import UserSignUp from "../Components/common/userSignUp";
 import TutorSignup from "../Components/common/TutorSignup";
 import toast, { Toaster } from "react-hot-toast";
+import AdminRoutes from "./AdminRoutes/AdminRoutes";
 const MainRoutes = () => {
   return (
     <>
@@ -19,6 +20,7 @@ const MainRoutes = () => {
 
         <Route path="/*" element={<StudentRoutes />} />
         <Route path="/tutor/*" element={<TutorRoutes />} />
+        <Route path="/admin/*" element={<AdminRoutes />} />
       </Routes>
       <ToastContainer />
     </>

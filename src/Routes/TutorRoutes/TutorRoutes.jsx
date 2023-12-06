@@ -7,7 +7,7 @@ const TutorRoutes = () => {
   return (
     <>
       <Routes>
-        <Route path="/tutor" element={<TutorLayout />}></Route>
+        <Route path="/" element={<TutorLayout />}></Route>
         <Route index element={<TutorHome />} />
       </Routes>
     </>

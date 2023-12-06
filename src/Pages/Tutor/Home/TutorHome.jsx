@@ -6,9 +6,9 @@ const TutorHome = () => {
   return (
     <>
       {" "}
-      <Head />
+      {/* <Head /> */}
       <TutorStickyNavbar />
-      <div className="text-2xl text-center">Welcome to Teacher</div>;{" "}
+      <div className="text-2xl text-center">Welcome to Teacher</div>{" "}
     </>
   );
 };

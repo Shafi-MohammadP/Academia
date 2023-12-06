@@ -2,8 +2,51 @@ import React from "react";
 import { Link } from "react-router-dom";
 import toast from "react-hot-toast";
 import { useNavigate } from "react-router-dom";
+import axios from "axios";
+import { useFormik } from "formik";
+import { tutorSugnupUrl } from "../../Constants/Constants";
+import { SignupValidationSchema } from "../../formvalidation/Signupvalidation";
 
 const TutorSignup = () => {
+  const navigate = useNavigate();
+  const initialState = {
+    username: "",
+    email: "",
+    password: "",
+    password2: "",
+    role: "tutor",
+  };
+  const { handleSubmit, handleChange, handleBlur, errors, touched, values } =
+    useFormik({
+      initialValues: initialState,
+      validationSchema: SignupValidationSchema,
+      onSubmit: async (values) => {
+        console.log(values, "pppppppppppppppppppppppppppppppppppppp");
+        try {
+          const responsedata = await axios.post(tutorSugnupUrl, values);
+          const response = responsedata.data;
+          console.log(
+            response,
+            "responseeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee"
+          );
+          if (response.status === 200) {
+            toast.success(response.Text);
+            navigate("/Login");
+          } else if (response.status === 400) {
+            toast.error(response.Text);
+            navigate("/tutor/signup/");
+          } else {
+            console.log(
+              responsedata,
+              "else errrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrorrrrr"
+            );
+          }
+        } catch (error) {
+          console.error("Erroun found during signup", error);
+        }
+      },
+    });
+
   return (
     <>
       <div className="grid grid-cols-1 sm:grid-cols-2">
@@ -15,45 +58,78 @@ const TutorSignup = () => {
           />
         </div>
         <div className="bg-gray-400 flex flex-col justify-center">
-          <form className="max-w-[400px] w-full mx-auto bg-blue-gray-900 p-8 px-8 rounded-lg">
+          <form
+            className="max-w-[400px] w-full mx-auto bg-blue-gray-900 p-8 px-8 rounded-lg"
+            onSubmit={handleSubmit}
+          >
             <h2 className="text text-4x text-white font-bold text-center">
               SIGN UP
             </h2>
-            <div className="flex flex-col text-gray-400 py-2">
+            <div className="flex flex-col text-white py-2">
               <label htmlFor="">Username</label>
               <input
-                className="rounded-lg bg-gray-400 mt-2 p-2 focus:border-blue-500 focus:bg-gray-800 focus:outline-none"
+                className="rounded-lg bg-black mt-2 p-2 focus:border-blue-500 focus:bg-gray-800 focus:outline-none"
+                onChange={handleChange}
+                value={values.username}
+                onBlur={handleBlur}
                 type="text"
                 name="username"
                 placeholder="username"
               />
+              {errors.username && touched.username && (
+                <span className="font-light  text-red-500">
+                  {errors.email}s
+                </span>
+              )}
             </div>
-            <div className="flex flex-col text-gray-400 py-2">
+            <div className="flex flex-col text-white py-2">
               <label htmlFor="">Email</label>
               <input
-                className="rounded-lg bg-gray-400 mt-2 p-2 focus:border-blue-500 focus:bg-gray-800 focus:outline-none"
+                className="rounded-lg bg-black mt-2 p-2 focus:border-blue-500 focus:bg-gray-800 focus:outline-none"
+                onChange={handleChange}
+                value={values.email}
+                onBlur={handleBlur}
                 type="email"
                 name="email"
                 placeholder="Enter your Email"
               />
+              {errors.email && touched.email && (
+                <span className="font-light  text-red-500">{errors.email}</span>
+              )}
             </div>
-            <div className="flex flex-col text-gray-400 py-2">
+            <div className="flex flex-col text-white py-2">
               <label htmlFor="">Password</label>
               <input
-                className="rounded-lg bg-gray-400 mt-2 p-2 focus:border-blue-500 focus:bg-gray-800 focus:outline-none"
+                className="rounded-lg bg-black mt-2 p-2 focus:border-blue-500 focus:bg-gray-800 focus:outline-none"
+                onChange={handleChange}
+                value={values.password}
+                onBlur={handleBlur}
                 type="password"
                 name="password"
                 placeholder="Password"
               />
+              {errors.password && touched.password && (
+                <span className="font-light  text-red-500">
+                  {errors.password}
+                </span>
+              )}
             </div>
-            <div className="flex flex-col text-gray-400 py-2">
+            <div className="flex flex-col text-white py-2">
               <label htmlFor="">Confirm Password</label>
               <input
-                className="rounded-lg bg-gray-400 mt-2 p-2 focus:border-blue-500 focus:bg-gray-800 focus:outline-none"
+                className="rounded-lg bg-black mt-2 p-2 focus:border-blue-500 focus:bg-gray-800 focus:outline-none"
+                onChange={handleChange}
+                value={values.password2}
+                onBlur={handleBlur}
                 type="password"
                 name="password2"
                 placeholder="Confirm Pasword"
               />
+              {errors.password2 && touched.password2 && (
+                <span className="font-light  text-red-500">
+                  {errors.password2}
+                </span>
+              )}
             </div>
             <div>
               <Link to={"/student/signup/"}>

@@ -9,6 +9,7 @@ import * as Yup from "yup";
 
 const userSignUp = () => {
   const navigate = useNavigate();
+  const cl = console.log.bind(console);
   const initialState = {
     username: "",
     email: "",

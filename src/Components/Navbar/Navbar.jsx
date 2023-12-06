@@ -1,4 +1,5 @@
 import React, { useEffect } from "react";
+
 import {
   Navbar,
   MobileNav,
@@ -14,9 +15,13 @@ import { resetState } from "../../redux/User";
 import { useDispatch } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import toast from "react-hot-toast";
+import logo from "../../assets/Company_Logo.png";
+
 export function StickyNavbar() {
   const [openNav, setOpenNav] = React.useState(false);
-  const student = useSelector((state) => state.user.userInfo);
+  const student = useSelector((state) => {
+    if (state.user.userInfo.role === "student") return state.user.userInfo;
+  });
   const dispatch = useDispatch();
   const navigate = useNavigate();
   useEffect(() => {
@@ -31,7 +36,7 @@ export function StickyNavbar() {
   }, []);
   const LogoutUser = () => {
     localStorage.removeItem("authToken");
-    dispatch(resetState);
+    dispatch(resetState());
     navigate("/Login");
     toast.success("Logout Success");
   };
@@ -90,7 +95,7 @@ export function StickyNavbar() {
             href="#"
             className="mr-4 cursor-pointer py-1.5 font-medium"
           >
-            Material Tailwind
+            <img src={logo} alt="" className="h-20 px-10" />
           </Typography>
           <div className="flex items-center gap-4">
             <div className="mr-4 hidden lg:block">{navList}</div>

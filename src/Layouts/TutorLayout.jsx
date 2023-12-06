@@ -3,7 +3,6 @@ import Head from "../Components/header/Head";
 import { Outlet } from "react-router-dom";
 import { TutorStickyNavbar } from "../Components/Navbar/TutorNavbar";
 
-
 const TutorLayout = () => {
   return (
     <>
