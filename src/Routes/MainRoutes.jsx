@@ -7,8 +7,11 @@ import { ToastContainer } from "react-toastify";
 import CommonLogin from "../Components/common/commonLogin";
 import UserSignUp from "../Components/common/userSignUp";
 import TutorSignup from "../Components/common/TutorSignup";
+
 import toast, { Toaster } from "react-hot-toast";
 import AdminRoutes from "./AdminRoutes/AdminRoutes";
+import CommonGoogle from "../Components/common/CommonGoogle";
+import EmailCheck from "../Components/common/Emailcheck";
 const MainRoutes = () => {
   return (
     <>
@@ -17,6 +20,8 @@ const MainRoutes = () => {
         <Route path="/Login" element={<CommonLogin />} />
         <Route path="/student/Signup/" element={<UserSignUp />} />
         <Route path="/tutor/Signup/" element={<TutorSignup />} />
+        <Route path="/googlelogin/" element={<CommonGoogle />} />
+        <Route path="/emailcheck/" element={<EmailCheck />} />
 
         <Route path="/*" element={<StudentRoutes />} />
         <Route path="/tutor/*" element={<TutorRoutes />} />

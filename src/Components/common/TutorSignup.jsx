@@ -4,7 +4,7 @@ import toast from "react-hot-toast";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import { useFormik } from "formik";
-import { tutorSugnupUrl } from "../../Constants/Constants";
+import { commonSignupurl } from "../../Constants/Constants";
 import { SignupValidationSchema } from "../../formvalidation/Signupvalidation";
 
 const TutorSignup = () => {
@@ -23,7 +23,7 @@ const TutorSignup = () => {
       onSubmit: async (values) => {
         console.log(values, "pppppppppppppppppppppppppppppppppppppp");
         try {
-          const responsedata = await axios.post(tutorSugnupUrl, values);
+          const responsedata = await axios.post(commonSignupurl, values);
           const response = responsedata.data;
           console.log(
             response,
@@ -31,7 +31,7 @@ const TutorSignup = () => {
           );
           if (response.status === 200) {
             toast.success(response.Text);
-            navigate("/Login");
+            navigate("/emailcheck/");
           } else if (response.status === 400) {
             toast.error(response.Text);
             navigate("/tutor/signup/");

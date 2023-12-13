@@ -14,6 +14,7 @@ import { faUser } from "@fortawesome/free-solid-svg-icons";
 import { useDispatch } from "react-redux";
 import { resetState } from "../../redux/User";
 import logo from "../../assets/Company_Logo.png";
+import axios from "axios";
 export function TutorStickyNavbar() {
   const navigate = useNavigate();
   const dispatch = useDispatch();
@@ -27,6 +28,16 @@ export function TutorStickyNavbar() {
       () => window.innerWidth >= 960 && setOpenNav(false)
     );
   }, []);
+  const profileShow = () => {
+    axios
+      .get(`http://127.0.0.1:8000/user/tutorProfile/${tutor.user_id}/`)
+      .then((response) => {
+        console.log(response.data); // Log the response data to the console
+      })
+      .catch((error) => {
+        console.error("Error fetching data:", error);
+      });
+  };
   const LogoutUser = () => {
     localStorage.removeItem("authToken");
     console.log("hlo..........");
@@ -48,14 +59,13 @@ export function TutorStickyNavbar() {
         </a>
       </Typography>
       <Typography
+        onClick={() => profileShow()}
         as="li"
         variant="small"
         color="blue-gray"
         className="p-1 font-normal"
       >
-        <NavLink to={"/profile"} className="flex items-center">
-          Account
-        </NavLink>
+        Account
       </Typography>
       <Typography
         as="li"

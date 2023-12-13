@@ -16,6 +16,7 @@ import { useDispatch } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import toast from "react-hot-toast";
 import logo from "../../assets/Company_Logo.png";
+import axios from "axios";
 
 export function StickyNavbar() {
   const [openNav, setOpenNav] = React.useState(false);
@@ -40,6 +41,25 @@ export function StickyNavbar() {
     navigate("/Login");
     toast.success("Logout Success");
   };
+  // console.log(
+  //   student.user_id,
+  //   "useridddddddddddddddddddddddddddddddddddddddddddddddddddd"
+  // );
+  const profileShow = () => {
+    if (!student) return;
+    if (student) {
+      axios
+        .get(`http://127.0.0.1:8000/user/studentProfile/${student.user_id}/`)
+        .then((response) => {
+          console.log(response.data); // Log the response data to the console
+        })
+        .catch((error) => {
+          console.error("Error fetching data:", error);
+        });
+    } else {
+      console.error("Student or student.user_id is undefined.");
+    }
+  };
 
   const navList = (
     <ul className="mt-2 mb-4 flex flex-col gap-2 lg:mb-0 lg:mt-0 lg:flex-row lg:items-center lg:gap-6">
@@ -54,14 +74,13 @@ export function StickyNavbar() {
         </a>
       </Typography>
       <Typography
+        onClick={() => profileShow()}
         as="li"
         variant="small"
         color="blue-gray"
         className="p-1 font-normal"
       >
-        <NavLink to={"/profile"} className="flex items-center">
-          Account
-        </NavLink>
+        Account
       </Typography>
       <Typography
         as="li"
@@ -104,7 +123,11 @@ export function StickyNavbar() {
                 Log In
               </Link> */}
               {student ? (
-                <Button onClick={LogoutUser} className="bg-[#051339] ">
+                <Button
+                  title="logout"
+                  onClick={LogoutUser}
+                  className="bg-[#051339] "
+                >
                   <FontAwesomeIcon icon={faUser} className="w-12 h-6" />
                 </Button>
               ) : (

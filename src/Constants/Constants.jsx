@@ -4,3 +4,5 @@ export const loginUrl = import.meta.env.VITE_loginUrl;
 export const stdentlistingUrl = import.meta.env.VITE_stdentlistingUrl;
 export const tutorlistingUrl = import.meta.env.VITE_tutorlistingUrl;
 export const GoogleClindId = import.meta.env.VITE_Clind_Id;
+export const GoogleLoginUrl = import.meta.env.VITE_googleLoginUrl;
+export const commonSignupurl = import.meta.env.VITE_Signup;

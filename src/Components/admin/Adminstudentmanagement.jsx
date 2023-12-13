@@ -122,6 +122,7 @@ export function MembersTable() {
               (
                 {
                   student_details,
+
                   first_name,
                   last_name,
                   email,
@@ -148,8 +149,7 @@ export function MembersTable() {
                             color="blue-gray"
                             className="font-normal"
                           >
-                            {student_details.first_name +
-                              student_details.last_name}
+                            {student_details.username}
                           </Typography>
                           {/* <Typography
                             variant="small"

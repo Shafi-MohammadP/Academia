@@ -1,31 +1,93 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Link } from "react-router-dom";
 import { Button } from "@material-tailwind/react";
-import { loginUrl } from "../../Constants/Constants";
-import axios from "axios";
+import { loginUrl, GoogleLoginUrl } from "../../Constants/Constants";
 import { jwtDecode } from "jwt-decode";
 import { useDispatch } from "react-redux";
 import { setUserDetails } from "../../redux/User";
 import toast, { Toaster } from "react-hot-toast";
 import { useGoogleLogin } from "@react-oauth/google";
-import { GoogleLogin } from "@react-oauth/google";
+import GoogleButton from "react-google-button";
+import axios from "axios";
 
-const commonLogin = () => {
+const CommonLogin = () => {
+  const [guser, setGuser] = useState();
+
   const navigate = useNavigate();
   const cl = console.log.bind(console);
   const [showSignUpOptions, setShowSignUpOptions] = useState(false);
   const dispatch = useDispatch();
+  useEffect(() => {
+    const googleAuth = async () => {
+      try {
+        if (!guser) return;
+        const response = await axios.get(
+          `https://www.googleapis.com/oauth2/v1/userinfo?access_token= ${guser.access_token}`,
+          {
+            headers: {
+              Authorization: `Bearer ${guser.access_token}`,
+              Accept: "application/json",
+            },
+          }
+        );
+        const googleuser = {
+          email: response.data.email,
+          username: response.data.name,
+          password: response.data.id,
+        };
+        try {
+          const backendresponse = await axios.post(GoogleLoginUrl, googleuser);
+          const res = backendresponse.data;
+          const token = jwtDecode(res.token.access_token);
+          console.log(token);
+          if (res.status === 200) {
+            localStorage.setItem("authToken", JSON.stringify(token));
+            const userSet = {
+              user_id: token.user_id,
+              name: token.username,
+              email: token.email,
+              is_admin: token.is_admin,
+              role: token.role,
+            };
+            dispatch(setUserDetails(userSet));
+            if (token.role === "student") {
+              navigate("/");
+              toast.success(res.Text);
+            } else if (token.role === "admin") {
+              navigate("/admin/");
+              toast.success(res.Text);
+            }
+          }
+        } catch (error) {
+          cl("Error During Loginnnnnnn", error);
+        }
+      } catch (error) {
+        console.log(error, "Error found during Gooogle Login");
+      }
+    };
+    if (guser) {
+      googleAuth();
+    }
+  }, [guser]);
+
+  const loginWithGoogle = useGoogleLogin({
+    onSuccess: (codeResponse) => {
+      setGuser(codeResponse);
+    },
+    onError: (error) => {
+      toast.error(error);
+      console.log(error, "this is the error");
+    },
+  });
   const handleSignupoption = () => {
     setShowSignUpOptions(!showSignUpOptions);
   };
   const handleOptionClick = (role) => {
     if (role === "student") {
       console.log(role);
-      cl(role, "secondddddddddddddddddddddddddddd");
       navigate("/student/signup/");
     } else {
-      console.log(role, "roooooooooooooooooo");
       navigate("/tutor/signup/");
     }
   };
@@ -42,9 +104,7 @@ const commonLogin = () => {
       });
       if (response.status === 200) {
         const data = await response.json();
-        console.log(data, "datttttttttttttttttttttttttttttttttttttaa");
         const token = jwtDecode(data.access);
-        console.log(token, "tokeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeen");
         localStorage.setItem("authToken", JSON.stringify(data));
         const setuser = {
           user_id: token.user_id,
@@ -60,7 +120,7 @@ const commonLogin = () => {
           toast.success("Login Succesfull", {
             duration: 1000,
           });
-        } else if ((token.role === "student") & token.is_active) {
+        } else if (token.role === "student") {
           navigate("/");
           toast.success("Logined succesfully");
         } else {
@@ -146,6 +206,16 @@ const commonLogin = () => {
                   Log In
                 </button>
 
+                <div className="my-5">
+                  <GoogleButton
+                    onClick={() => loginWithGoogle()}
+                    // className="py-2 bg-orange-500 shadow-orange-500/50 hover:shadow-orange-500/30 text-white font-semibold rounded-lg"
+                    style={{ width: "100%", height: "100%" }}
+                  >
+                    Log In with Google
+                  </GoogleButton>
+                </div>
+
                 <div>
                   <p className="text-white">
                     No Account?
@@ -168,4 +238,4 @@ const commonLogin = () => {
   );
 };
 
-export default commonLogin;
+export default CommonLogin;

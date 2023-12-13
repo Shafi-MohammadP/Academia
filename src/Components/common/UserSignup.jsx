@@ -1,13 +1,16 @@
 import React from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { studentSugnupUrl } from "../../Constants/Constants";
+import { commonSignupurl } from "../../Constants/Constants";
 import axios from "axios";
 import toast from "react-hot-toast";
 import { SignupValidationSchema } from "../../formvalidation/Signupvalidation";
 import { useFormik } from "formik";
 import * as Yup from "yup";
+import { useDispatch } from "react-redux";
+import { setUseremail } from "../../redux/Email";
 
 const userSignUp = () => {
+  const dispatch = useDispatch();
   const navigate = useNavigate();
   const cl = console.log.bind(console);
   const initialState = {
@@ -27,15 +30,19 @@ const userSignUp = () => {
             values,
             "valueeeeeeeeeeeeeeeeeeeeeeeeeeeesssssssssssssssssssss"
           );
-          const responseData = await axios.post(studentSugnupUrl, values);
+          const responseData = await axios.post(commonSignupurl, values);
           const response = responseData.data;
           console.log(response, "oooooooooooooooo");
-          console.log(responseData, "iiiiiiiiiiiiiiiiiiiiiiiiii");
+          console.log(responseData.data, "iiiiiiiiiiiiiiiiiiiiiiiiii");
           if (response.status === 200) {
+            const setEmail = {
+              email: values.email,
+            };
+            dispatch(setUseremail(setEmail));
             toast.success(response.Text);
-            navigate("/Login");
+            navigate("/emailcheck/");
           } else if (response.status === 400) {
-            toast.error(responseData.data[0]);
+            toast.error(response.Text);
           }
         } catch (error) {
           console.error("Errro during Sign up", error);
