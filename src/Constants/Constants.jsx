@@ -6,3 +6,4 @@ export const tutorlistingUrl = import.meta.env.VITE_tutorlistingUrl;
 export const GoogleClindId = import.meta.env.VITE_Clind_Id;
 export const GoogleLoginUrl = import.meta.env.VITE_googleLoginUrl;
 export const commonSignupurl = import.meta.env.VITE_Signup;
+export const BaseUrl = "http://127.0.0.1:8000/";

@@ -10,10 +10,12 @@ import toast, { Toaster } from "react-hot-toast";
 import { useGoogleLogin } from "@react-oauth/google";
 import GoogleButton from "react-google-button";
 import axios from "axios";
+import { Loader } from "../Loader/Loader";
 
 const CommonLogin = () => {
   const [guser, setGuser] = useState();
-
+  const [loading, setLoading] = useState(false);
+  const handleLoading = () => setLoading((cur) => !cur);
   const navigate = useNavigate();
   const cl = console.log.bind(console);
   const [showSignUpOptions, setShowSignUpOptions] = useState(false);
@@ -40,9 +42,9 @@ const CommonLogin = () => {
           const backendresponse = await axios.post(GoogleLoginUrl, googleuser);
           const res = backendresponse.data;
           const token = jwtDecode(res.token.access_token);
-          console.log(token);
+          console.log(token, "gfdgfdgfdgfdg");
           if (res.status === 200) {
-            localStorage.setItem("authToken", JSON.stringify(token));
+            localStorage.setItem("authToken", JSON.stringify(res.token));
             const userSet = {
               user_id: token.user_id,
               name: token.username,
@@ -56,6 +58,9 @@ const CommonLogin = () => {
               toast.success(res.Text);
             } else if (token.role === "admin") {
               navigate("/admin/");
+              toast.success(res.Text);
+            } else if (token.role === "tutor") {
+              navigate("/tutor/");
               toast.success(res.Text);
             }
           }
@@ -93,6 +98,7 @@ const CommonLogin = () => {
   };
   const Loginuser = async (e) => {
     e.preventDefault();
+    handleLoading();
     try {
       const response = await fetch(`${loginUrl}`, {
         method: "POST",
@@ -135,16 +141,19 @@ const CommonLogin = () => {
       }
     } catch (error) {
       toast.error("Error During Login", error);
+    } finally {
+      handleLoading();
     }
   };
 
   return (
     <>
+      {loading && <Loader />}
       <div className="grid grid-cols-1 sm:grid-cols-2">
         <div className="hidden sm:block">
           <img
             className="w-full h-full object-cover"
-            src="https://static.vecteezy.com/system/resources/previews/000/460/211/original/vector-e-learning-concept-flat.jpg"
+             src="https://static.vecteezy.com/system/resources/previews/000/460/211/original/vector-e-learning-concept-flat.jpg"
             alt=""
           />
         </div>
