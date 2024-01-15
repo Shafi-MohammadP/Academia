@@ -7,7 +7,7 @@ import TutorNavbarNew from "../Components/Navbar/TutorNavbarNew";
 const TutorLayout = () => {
   return (
     <>
-      <div className="overflow-x-hidden">
+      <div className="overflow-x-hidden min-h-screen">
         {/* <Head /> */}
         <TutorStickyNavbar />
         {/* <TutorNavbarNew /> */}

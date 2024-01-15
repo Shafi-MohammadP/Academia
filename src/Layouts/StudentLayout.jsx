@@ -8,7 +8,7 @@ import StudentNavbar from "../Components/Navbar/StudentNavbar";
 const StudentLayout = () => {
   return (
     <>
-      <div className="overflow-x-hidden">
+      <div className="overflow-x-hidden min-h-screen">
         {/* <Head /> */}
         {/* <StickyNavbar /> */}
         {/* <DemoNavbar /> */}

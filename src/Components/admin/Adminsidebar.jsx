@@ -1,6 +1,12 @@
 import React from "react";
 import toast from "react-hot-toast";
 import logo from "../../assets/Company_Logo.png";
+import DashboardIcon from "@mui/icons-material/Dashboard";
+import SchoolIcon from "@mui/icons-material/School";
+import CastForEducationIcon from "@mui/icons-material/CastForEducation";
+import CategoryIcon from "@mui/icons-material/Category";
+import AutoStoriesIcon from "@mui/icons-material/AutoStories";
+import AutoStoriesSharpIcon from "@mui/icons-material/AutoStoriesSharp";
 import {
   Card,
   Typography,
@@ -57,7 +63,7 @@ export function MultiLevelSidebar() {
           </Typography>
         </div>
         <List>
-          <Accordion
+          {/* <Accordion
             open={open === 1}
             icon={
               <ChevronDownIcon
@@ -84,19 +90,19 @@ export function MultiLevelSidebar() {
             <AccordionBody className="py-1">
               <List className="p-0">
                 <Link to={"/admin/studentmanagement/"}>
-                  <ListItem>
+                  <ListItem className="text-black">
                     <ListItemPrefix>
                       <ChevronRightIcon strokeWidth={3} className="h-3 w-5" />
                     </ListItemPrefix>
-                    Student Managemnt
+                    Student Management
                   </ListItem>
                 </Link>
                 <Link to={"/admin/tutormanagment/"}>
-                  <ListItem>
+                  <ListItem className="text-black">
                     <ListItemPrefix>
                       <ChevronRightIcon strokeWidth={3} className="h-3 w-5" />
                     </ListItemPrefix>
-                    Tutor Managment
+                    Tutor Management
                   </ListItem>
                 </Link>
                 <ListItem>
@@ -148,33 +154,55 @@ export function MultiLevelSidebar() {
                 </ListItem>
               </List>
             </AccordionBody>
-          </Accordion>
+          </Accordion> */}
           <ListItem>
             <ListItemPrefix>
-              <InboxIcon className="h-5 w-5" />
+              <DashboardIcon className="h-5 w-5" />
             </ListItemPrefix>
-            Inbox
+            <Link className="text-black" to={"/admin"}>
+              Dashboard
+            </Link>
+          </ListItem>
+          <ListItem>
+            <ListItemPrefix>
+              <SchoolIcon className="h-5 w-5" />
+            </ListItemPrefix>
+            <Link className="text-black" to={"/admin/studentmanagement/"}>
+              student management
+            </Link>
+          </ListItem>
+          <ListItem>
+            <ListItemPrefix>
+              <CastForEducationIcon className="h-5 w-5" />
+            </ListItemPrefix>
+            <Link className="text-black" to={"/admin/tutormanagment/"}>
+              Tutor management
+            </Link>
             <ListItemSuffix>
-              <Chip
+              {/* <Chip
                 value="14"
                 size="sm"
                 variant="ghost"
                 color="blue-gray"
                 className="rounded-full"
-              />
+              /> */}
             </ListItemSuffix>
           </ListItem>
           <ListItem>
             <ListItemPrefix>
-              <UserCircleIcon className="h-5 w-5" />
+              <CategoryIcon className="h-5 w-5" />
             </ListItemPrefix>
-            Profile
+            <Link className="text-black" to={"/admin/categoryManagement"}>
+              Category Management
+            </Link>
           </ListItem>
           <ListItem>
             <ListItemPrefix>
-              <Cog6ToothIcon className="h-5 w-5" />
+              <AutoStoriesSharpIcon className="h-5 w-5" />
             </ListItemPrefix>
-            Settings
+            <Link className="text-black" to={"/admin/courseManagement/"}>
+              Course Management
+            </Link>
           </ListItem>
           <ListItem onClick={Logoutadmin}>
             <ListItemPrefix>

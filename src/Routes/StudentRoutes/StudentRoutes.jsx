@@ -4,6 +4,7 @@ import StudentLayout from "../../Layouts/StudentLayout";
 import Home from "../../Pages/Student/Home/Home";
 import Userprotected from "../protectedRoutes/Userprotected";
 import StudentProfilePage from "../../Pages/Student/Profile/StudentProfile";
+import CourseView from "../../Components/Student/CourseView";
 // import { LoginPage } from "../../Pages/Student/Login/Login";
 // import { SignupPage } from "../../Pages/Student/Signup/Signup";
 
@@ -15,6 +16,7 @@ const StudentRoutes = () => {
           <Route element={<Userprotected />}>
             <Route index element={<Home />} />
             <Route path="studentprofile/" element={<StudentProfilePage />} />
+            <Route path="courseView/:id/" element={<CourseView />} />
           </Route>
         </Route>
       </Routes>

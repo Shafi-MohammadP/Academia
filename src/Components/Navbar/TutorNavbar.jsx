@@ -8,14 +8,19 @@ import { Link, NavLink } from "react-router-dom";
 import { useSelector } from "react-redux/es/hooks/useSelector";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faUser } from "@fortawesome/free-solid-svg-icons";
-import { resetState } from "../../redux/User";
+import { resetState, setTutor_id } from "../../redux/User";
 import { useNavigate } from "react-router-dom";
 import toast from "react-hot-toast";
 import logo from "../../assets/Company_Logo.png";
+import { BaseUrl } from "../../Constants/Constants";
 import axios from "axios";
+import { Loader } from "../Loader/Loader";
 export function TutorStickyNavbar() {
+  const [user, setUser] = useState([]);
+  const dispatch = useDispatch();
+  const navRef = useRef();
   const [isDropdownVisible, setDropdownVisible] = useState(false);
-
+  const { tutor_id } = useSelector((state) => state.user);
   // Toggle dropdown visibility
   const toggleDropdown = () => {
     setDropdownVisible(!isDropdownVisible);
@@ -24,17 +29,25 @@ export function TutorStickyNavbar() {
   const tutor = useSelector((state) => {
     if (state.user.userInfo.role === "tutor") return state.user.userInfo;
   });
+  console.log(tutor, "navbaar");
   useEffect(() => {
     if (!tutor) return;
+    if (!tutor_id) {
+      axios.get(`${BaseUrl}user/tutorProfile/${tutor.user_id}`).then((res) => {
+        setUser(res.data);
+        dispatch(setTutor_id(res.data.id));
+        console.log(res.data, "navbar");
+      });
+    }
+  }, []);
+  // if (!tutor) {
+  //   return <Loader />;
+  // }
 
-    console.log(tutor, "tutor found");
-  });
-
-  const dispatch = useDispatch();
-  const navRef = useRef();
   const logoutUser = () => {
     localStorage.removeItem("authToken");
     dispatch(resetState());
+
     navigate("/Login");
     toast.success("Logout Success");
   };
@@ -125,7 +138,8 @@ export function TutorStickyNavbar() {
           <a href="">My work</a>
           <a href="">Blog</a>
           <a href="">About me</a>
-          <a href="/tutor/applicationform">Application Form</a>
+          {/* <a href="/tutor/applicationform">Add Course</a> */}
+          <Link to={`/tutor/applicationform/`}>Add Course</Link>
 
           {/* Move the Button with FontAwesome icon to the end of the nav element */}
 
@@ -159,7 +173,10 @@ export function TutorStickyNavbar() {
               <div className="absolute top-12 right-0 mt-2 bg-white border rounded shadow-md z-10 w-48">
                 <ul>
                   <li>
-                    <Link to={"/tutor/tutorprofile"}> Profile</Link>
+                    <Link to={"/tutor/tutorprofile"} onClick={toggleDropdown}>
+                      {" "}
+                      Profile
+                    </Link>
                   </li>
                   <li>
                     {/* Add your logout functionality here */}

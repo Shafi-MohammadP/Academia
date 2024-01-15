@@ -1,6 +1,6 @@
 import { jwtDecode } from "jwt-decode";
 import React from "react";
-import { Outlet } from "react-router-dom";
+import { Navigate, Outlet } from "react-router-dom";
 import TutorRoutes from "../TutorRoutes/TutorRoutes";
 import StudentRoutes from "../StudentRoutes/StudentRoutes";
 import CommonLogin from "../../Components/common/commonLogin";
@@ -21,7 +21,7 @@ function Adminprotected() {
       }
     }
   } else {
-    return <CommonLogin />;
+    return <Navigate to={"/login"} replace />;
   }
 }
 

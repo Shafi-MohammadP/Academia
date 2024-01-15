@@ -1,6 +1,10 @@
 import { MagnifyingGlassIcon } from "@heroicons/react/24/outline";
 import { PencilIcon, UserPlusIcon } from "@heroicons/react/24/solid";
-import { stdentlistingUrl, studentSugnupUrl } from "../../Constants/Constants";
+import {
+  BaseUrl,
+  stdentlistingUrl,
+  studentSugnupUrl,
+} from "../../Constants/Constants";
 import { useState } from "react";
 import axios from "axios";
 import {
@@ -20,6 +24,7 @@ import {
   Tooltip,
 } from "@material-tailwind/react";
 import { useEffect } from "react";
+import toast from "react-hot-toast";
 
 const TABS = [
   {
@@ -40,28 +45,50 @@ const TABLE_HEAD = ["name", "Email", "Bio", "status", ""];
 
 export function MembersTable() {
   const [student, setStudent] = useState([]);
-  const cl = console.log.bind(console);
+  const [change, setChange] = useState(false);
+
   useEffect(() => {
     const fetchData = async () => {
       try {
         const response = await axios.get(stdentlistingUrl);
-        // Process the response or set state based on the data received
-
-        cl(response.data, "studentttttttttttttttttttttttttttttttttttttttt");
+        console.log(response.data);
         setStudent(response.data);
       } catch (error) {
-        // Handle errors
         console.error("Error fetching student data:", error);
       }
     };
 
-    fetchData(); // Call the async function
-  }, []);
-  cl(student, "newstudent..........................");
+    fetchData();
+  }, [change]);
+  const handleBlock = async (value) => {
+    const apiUrl = `${BaseUrl}dashboard/userBlockAndUnblock/${value}/`;
+    const tokenDataString = localStorage.getItem("authToken");
+    const tokenData = JSON.parse(tokenDataString);
+    const accessToken = tokenData ? tokenData.access : null;
+    try {
+      const response = await fetch(apiUrl, {
+        method: "DELETE",
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+          "Content-type": "application/json",
+        },
+      });
+      const responseData = await response.json();
+      if (responseData.status === 200) {
+        setChange(!change);
+        toast.success(responseData.message);
+      } else {
+        toast.error(responseData.message);
+      }
+    } catch (err) {
+      console.log(err, "Error Found During Blocking");
+      toast.error("catch working");
+    }
+  };
   return (
     <Card className="h-full w-full">
       <CardHeader floated={false} shadow={false} className="rounded-none">
-        <div className="mb-8 flex items-center justify-between gap-8">
+        <div className="flex items-center justify-between gap-8">
           <div>
             <Typography variant="h5" color="blue-gray">
               Student list
@@ -126,9 +153,10 @@ export function MembersTable() {
                   first_name,
                   last_name,
                   email,
+                  user,
                   bio,
                   org,
-                  is_blocked,
+                  is_active,
                   date,
                 },
                 index
@@ -194,14 +222,19 @@ export function MembersTable() {
                         <Chip
                           variant="ghost"
                           size="sm"
-                          value={is_blocked ? "BLOCKED" : "ACTIVE"}
-                          color={is_blocked ? "blue-gray" : "green"}
+                          value={
+                            student_details.is_active ? "Active" : "Blocked"
+                          }
+                          color={student_details.is_active ? "green" : "red"}
                         />
                       </div>
                     </td>
                     <td className={classes}>
                       <Tooltip content="Edit User">
-                        <IconButton variant="text">
+                        <IconButton
+                          variant="text"
+                          onClick={() => handleBlock(user)}
+                        >
                           <PencilIcon className="h-4 w-4" />
                         </IconButton>
                       </Tooltip>

@@ -1,10 +1,9 @@
 import { jwtDecode } from "jwt-decode";
 import React from "react";
 import AdminRoutes from "../AdminRoutes/AdminRoutes";
-import { Outlet, useNavigate } from "react-router-dom";
+import { Navigate, Outlet } from "react-router-dom";
 import StudentRoutes from "../StudentRoutes/StudentRoutes";
 import CommonLogin from "../../Components/common/commonLogin";
-import TutorSignup from "../../Components/common/TutorSignup";
 
 const Tutorprotected = () => {
   const token = localStorage.getItem("authToken");
@@ -22,7 +21,7 @@ const Tutorprotected = () => {
       }
     }
   } else {
-    return <CommonLogin />;
+    return <Navigate to={"/login"} replace />;
   }
 };
 

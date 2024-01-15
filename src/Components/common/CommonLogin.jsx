@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Link } from "react-router-dom";
 import { Button } from "@material-tailwind/react";
-import { loginUrl, GoogleLoginUrl } from "../../Constants/Constants";
+import { loginUrl, GoogleLoginUrl, BaseUrl } from "../../Constants/Constants";
 import { jwtDecode } from "jwt-decode";
 import { useDispatch } from "react-redux";
 import { setUserDetails } from "../../redux/User";
@@ -112,26 +112,59 @@ const CommonLogin = () => {
         const data = await response.json();
         const token = jwtDecode(data.access);
         localStorage.setItem("authToken", JSON.stringify(data));
-        const setuser = {
-          user_id: token.user_id,
-          name: token.username,
-          email: token.email,
-          is_admin: token.is_admin,
-          role: token.role,
-        };
-        dispatch(setUserDetails(setuser));
-
-        if (token.is_admin && token.is_active) {
+        let apiUrl = null;
+        if (token.role === "tutor") {
+          apiUrl = `${BaseUrl}tutor/TutorProfileShow/${token.user_id}`;
+        } else if (token.role === "student") {
+          apiUrl = `${BaseUrl}student/StudentProfileShow/${token.user_id}`;
+        } else if (token.role === "admin") {
+          const setAdmin = {
+            user_id: token.user_id,
+            name: token.username,
+            email: token.email,
+            is_admin: token.is_admin,
+            role: token.role,
+          };
+          dispatch(setUserDetails(setAdmin));
           navigate("/admin/");
-          toast.success("Login Succesfull", {
+          toast.success("Login Successful", {
             duration: 1000,
           });
-        } else if (token.role === "student") {
-          navigate("/");
-          toast.success("Logined succesfully");
+          return;
         } else {
-          navigate("/tutor");
-          toast.success("Logined succesfully");
+          console.log("unAuthorized person");
+        }
+        let result = null;
+        try {
+          result = await axios.get(apiUrl);
+        } catch (err) {
+          console.log(err, "error");
+        }
+        if (result.data.status === 200) {
+          const setuser = {
+            user_id: token.user_id,
+            name: token.username,
+            email: token.email,
+            is_admin: token.is_admin,
+            role: token.role,
+            id: result.data.data,
+          };
+          dispatch(setUserDetails(setuser));
+
+          if (token.is_admin && token.is_active) {
+            navigate("/admin/");
+            toast.success("Login Succesfull", {
+              duration: 1000,
+            });
+          } else if (token.role === "student") {
+            navigate("/");
+            toast.success("Logined succesfully");
+          } else {
+            navigate("/tutor");
+            toast.success("Logined succesfully");
+          }
+        } else {
+          console.log("Profile fetched wrong");
         }
       } else if (response.status === 401) {
         toast.error("Credential mismatch");
@@ -141,6 +174,7 @@ const CommonLogin = () => {
       }
     } catch (error) {
       toast.error("Error During Login", error);
+      console.log(error, "new Error");
     } finally {
       handleLoading();
     }
@@ -153,7 +187,7 @@ const CommonLogin = () => {
         <div className="hidden sm:block">
           <img
             className="w-full h-full object-cover"
-             src="https://static.vecteezy.com/system/resources/previews/000/460/211/original/vector-e-learning-concept-flat.jpg"
+            src="https://static.vecteezy.com/system/resources/previews/000/460/211/original/vector-e-learning-concept-flat.jpg"
             alt=""
           />
         </div>

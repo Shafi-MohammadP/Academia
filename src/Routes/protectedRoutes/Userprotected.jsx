@@ -1,5 +1,5 @@
 import React from "react";
-import { Outlet, useNavigate } from "react-router-dom";
+import { Navigate, Outlet, useNavigate } from "react-router-dom";
 import AdminRoutes from "../AdminRoutes/AdminRoutes";
 import StudentRoutes from "../StudentRoutes/StudentRoutes";
 import TutorRoutes from "../TutorRoutes/TutorRoutes";
@@ -22,7 +22,7 @@ function Userprotected() {
       }
     }
   } else {
-    return <CommonLogin />;
+    return <Navigate to={"/login"} replace />;
   }
 }
 

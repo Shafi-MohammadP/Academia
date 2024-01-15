@@ -17,7 +17,7 @@ const MainRoutes = () => {
     <>
       <Toaster />
       <Routes>
-        <Route path="/Login" element={<CommonLogin />} />
+        <Route path="/login" element={<CommonLogin />} />
         <Route path="/student/Signup/" element={<UserSignUp />} />
         <Route path="/tutor/Signup/" element={<TutorSignup />} />
         <Route path="/googlelogin/" element={<CommonGoogle />} />

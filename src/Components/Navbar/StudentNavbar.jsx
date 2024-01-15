@@ -16,17 +16,19 @@ import axios from "axios";
 
 const StudentNavbar = () => {
   const [isDropdownVisible, setDropdownVisible] = useState(false);
+  // const [profile, setProfile] = useState(false);
+  const handleProfile = () => setProfile((cur) => !cur);
+  const navigate = useNavigate();
+  const [user, setUser] = useState([]);
+  const student = useSelector((state) => {
+    if (state.user.userInfo.role === "student") return state.user.userInfo;
+  });
 
   // Toggle dropdown visibility
   const toggleDropdown = () => {
     setDropdownVisible(!isDropdownVisible);
   };
 
-  const navigate = useNavigate();
-  const [user, setUser] = useState([]);
-  const student = useSelector((state) => {
-    if (state.user.userInfo.role === "student") return state.user.userInfo;
-  });
   useEffect(() => {
     const fetchStudentProfile = async () => {
       try {
@@ -44,7 +46,6 @@ const StudentNavbar = () => {
 
     fetchStudentProfile(); // Call the function to fetch student profile
   }, [student]);
-
   const dispatch = useDispatch();
   const navRef = useRef();
   const logoutUser = () => {
@@ -99,8 +100,8 @@ const StudentNavbar = () => {
               <div className="absolute top-12 right-0 mt-2 bg-white border rounded shadow-md z-10 w-48">
                 <ul>
                   <li>
-                    <Link to={{ pathname: "/studentprofile", state: { user } }}>
-                      Profile
+                    <Link to={"/studentprofile"} onClick={toggleDropdown}>
+                      profile
                     </Link>
                   </li>
                   <li>

@@ -76,9 +76,7 @@ nav {
   header .responsive_nav {
     transform: translateY(100vh);
   }
-  /* header .user {
-    align-items: flex-end;
-  } */
+
   header .user {
     visibility: hidden;
   }

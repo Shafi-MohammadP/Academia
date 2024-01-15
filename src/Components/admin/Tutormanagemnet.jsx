@@ -1,6 +1,6 @@
 import { MagnifyingGlassIcon } from "@heroicons/react/24/outline";
 import { PencilIcon, UserPlusIcon } from "@heroicons/react/24/solid";
-import { tutorlistingUrl } from "../../Constants/Constants";
+import { BaseUrl, tutorlistingUrl } from "../../Constants/Constants";
 import { useState } from "react";
 import axios from "axios";
 import {
@@ -20,6 +20,7 @@ import {
   Tooltip,
 } from "@material-tailwind/react";
 import { useEffect } from "react";
+import toast from "react-hot-toast";
 
 const TABS = [
   {
@@ -40,7 +41,7 @@ const TABLE_HEAD = ["name", "Email", "Bio", "Qualifications", "status", ""];
 
 export function MembersTable() {
   const [tutor, setTutor] = useState([]);
-  const [user, setuser] = useState([]);
+  const [change, setChange] = useState(false);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -48,45 +49,50 @@ export function MembersTable() {
         const response = await axios.get(tutorlistingUrl);
         setTutor(response.data);
       } catch (error) {
-        console.log(error, "this error foundddddddddddddddddd");
+        console.log(error, "this error found");
       }
     };
 
     fetchData();
-  }, []);
-  console.log(tutor, "iuiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiii");
+  }, [change]);
+  const handleBlock = async (value) => {
+    const apiUrl = `${BaseUrl}dashboard/userBlockAndUnblock/${value}/`;
+    const tokenDataString = localStorage.getItem("authToken");
+    const tokenData = JSON.parse(tokenDataString);
+    const accessToken = tokenData ? tokenData.access : null;
+    try {
+      const response = await fetch(apiUrl, {
+        method: "DELETE",
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+          "Content-type": "application/json",
+        },
+      });
+      const responseData = await response.json();
+      console.log(responseData);
+      if (responseData.status === 200) {
+        setChange(!change);
+        toast.success(responseData.message);
+      } else {
+        toast.error(responseData.message);
+      }
+    } catch (err) {
+      console.log(err, "Error found during fetching");
+    }
+  };
 
   return (
     <Card className="h-full w-full">
       <CardHeader floated={false} shadow={false} className="rounded-none">
-        <div className="mb-8 flex items-center justify-between gap-8">
+        <div className="flex items-center justify-between gap-8">
           <div>
             <Typography variant="h5" color="blue-gray">
-              Student list
+              Teachers List
             </Typography>
-            <Typography color="gray" className="mt-1 font-normal">
-              {/* See information about all members */}
-            </Typography>
+            <Typography color="gray" className=" font-normal"></Typography>
           </div>
-          {/* <div className="flex shrink-0 flex-col gap-2 sm:flex-row">
-            <Button variant="outlined" size="sm">
-              view all
-            </Button>
-            <Button className="flex items-center gap-3" size="sm">
-              <UserPlusIcon strokeWidth={2} className="h-4 w-4" /> Add member
-            </Button>
-          </div> */}
         </div>
         <div className="flex flex-col items-center justify-between gap-4 md:flex-row">
-          {/* <Tabs value="all" className="w-full md:w-max">
-            <TabsHeader>
-              {TABS.map(({ label, value }) => (
-                <Tab key={value} value={value}>
-                  &nbsp;&nbsp;{label}&nbsp;&nbsp;
-                </Tab>
-              ))}
-            </TabsHeader>
-          </Tabs> */}
           <div className="w-full md:w-72">
             <Input
               label="Search"
@@ -117,7 +123,10 @@ export function MembersTable() {
           </thead>
           <tbody>
             {tutor.map(
-              ({ tutor_details, bio, qualification, is_blocked }, index) => {
+              (
+                { tutor_details, bio, qualification, is_blocked, user },
+                index
+              ) => {
                 const isLast = index === tutor.length - 1;
                 const classes = isLast
                   ? "p-4"
@@ -138,13 +147,6 @@ export function MembersTable() {
                               ? tutor_details.username
                               : `${tutor_details.first_name} ${tutor_details.last_name}`}
                           </Typography>
-                          {/* <Typography
-                            variant="small"
-                            color="blue-gray"
-                            className="font-normal opacity-70"
-                          >
-                            {email}
-                          </Typography> */}
                         </div>
                       </div>
                     </td>
@@ -190,15 +192,21 @@ export function MembersTable() {
                         <Chip
                           variant="ghost"
                           size="sm"
-                          value={is_blocked ? "BLOCKED" : "ACTIVE"}
-                          color={is_blocked ? "green" : "blue-gray"}
+                          value={tutor_details.is_active ? "Active" : "Block"}
+                          color={tutor_details.is_active ? "green" : "red"}
                         />
                       </div>
                     </td>
                     <td className={classes}>
                       <Tooltip content="Edit User">
-                        <IconButton variant="text">
-                          <PencilIcon className="h-4 w-4" />
+                        <IconButton
+                          variant="text"
+                          onClick={() => handleBlock(user)}
+                        >
+                          <PencilIcon
+                            // onClick={() => handleBlock(user)}
+                            className="h-4 w-4"
+                          />
                         </IconButton>
                       </Tooltip>
                     </td>
