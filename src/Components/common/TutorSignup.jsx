@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import { Link } from "react-router-dom";
 import toast from "react-hot-toast";
 import { useNavigate } from "react-router-dom";
@@ -6,8 +6,10 @@ import axios from "axios";
 import { useFormik } from "formik";
 import { commonSignupurl } from "../../Constants/Constants";
 import { SignupValidationSchema } from "../../formvalidation/Signupvalidation";
+import { Loader } from "../Loader/Loader";
 
 const TutorSignup = () => {
+  const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
   const initialState = {
     username: "",
@@ -21,6 +23,7 @@ const TutorSignup = () => {
       initialValues: initialState,
       validationSchema: SignupValidationSchema,
       onSubmit: async (values) => {
+        setLoading(true);
         console.log(values, "pppppppppppppppppppppppppppppppppppppp");
         try {
           const responsedata = await axios.post(commonSignupurl, values);
@@ -43,12 +46,15 @@ const TutorSignup = () => {
           }
         } catch (error) {
           console.error("Erroun found during signup", error);
+        } finally {
+          setLoading(false);
         }
       },
     });
 
   return (
     <>
+      {loading && <Loader />}
       <div className="grid grid-cols-1 sm:grid-cols-2">
         <div className="hidden sm:block">
           <img

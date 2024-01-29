@@ -5,6 +5,7 @@ import Home from "../../Pages/Student/Home/Home";
 import Userprotected from "../protectedRoutes/Userprotected";
 import StudentProfilePage from "../../Pages/Student/Profile/StudentProfile";
 import CourseView from "../../Components/Student/CourseView";
+import Head from "../../Components/header/Head";
 // import { LoginPage } from "../../Pages/Student/Login/Login";
 // import { SignupPage } from "../../Pages/Student/Signup/Signup";
 
@@ -17,6 +18,7 @@ const StudentRoutes = () => {
             <Route index element={<Home />} />
             <Route path="studentprofile/" element={<StudentProfilePage />} />
             <Route path="courseView/:id/" element={<CourseView />} />
+            <Route path="newDemo/" element={<Head />} />
           </Route>
         </Route>
       </Routes>

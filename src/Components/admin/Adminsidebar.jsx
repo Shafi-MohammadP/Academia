@@ -204,6 +204,22 @@ export function MultiLevelSidebar() {
               Course Management
             </Link>
           </ListItem>
+          <ListItem>
+            <ListItemPrefix>
+              <AutoStoriesSharpIcon className="h-5 w-5" />
+            </ListItemPrefix>
+            <Link className="text-black" to={"/admin/certificateManagement/"}>
+              Certificate Management
+            </Link>
+          </ListItem>
+          <ListItem>
+            <ListItemPrefix>
+              <AutoStoriesSharpIcon className="h-5 w-5" />
+            </ListItemPrefix>
+            <Link className="text-black" to={"/admin/videoManagement/"}>
+              Video Management
+            </Link>
+          </ListItem>
           <ListItem onClick={Logoutadmin}>
             <ListItemPrefix>
               <PowerIcon className="h-5 w-5" />

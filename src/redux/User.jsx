@@ -4,6 +4,7 @@ const initialState = {
   userInfo: {},
   tutor_id: null,
   student_id: null,
+  notifications: null,
 };
 
 export const userSlice = createSlice({
@@ -20,16 +21,22 @@ export const userSlice = createSlice({
     },
     setTutor_id: (state, action) => {
       state.tutor_id = action.payload;
-      console.log(action.payload, "tutor_id redux");
     },
     setStudent_id: (state, action) => {
-      state.student_id(action.payload);
-      console.log(action.payload, "student_id redux");
+      state.student_id = action.payload;
+    },
+    setNotifications: (state, action) => {
+      state.notifications = action.payload;
     },
   },
 });
 
-export const { setUserDetails, setTutor_id, setStudent_id, resetState } =
-  userSlice.actions;
+export const {
+  setUserDetails,
+  setTutor_id,
+  setStudent_id,
+  resetState,
+  setNotifications,
+} = userSlice.actions;
 
 export default userSlice.reducer;

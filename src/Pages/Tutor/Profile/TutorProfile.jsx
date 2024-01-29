@@ -1,7 +1,7 @@
 import React from "react";
 import { useEffect, useState } from "react";
 import axios from "axios";
-import { BaseUrl } from "../../../Constants/Constants";
+import { BaseUrl, imageBaseUrl } from "../../../Constants/Constants";
 import { Button } from "@material-tailwind/react";
 import Box from "@mui/material/Box";
 import Typography from "@mui/material/Typography";
@@ -47,18 +47,14 @@ import { faCamera } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import toast from "react-hot-toast";
 const TutorProfile = () => {
-  const [change, setChange] = useState(0);
-  const handleSetChange = () => {
-    setChange((pre) => pre + 1);
-    console.log(change, "change");
-  };
+  const [change, setChange] = useState(false);
+
   const [user, setUser] = useState([]);
   const [openCertificate, setOpenCertificate] = useState(false);
   const handleCertificateClose = () => setOpenCertificate(false);
   const handleCertificateOpen = () => setOpenCertificate(!open);
   const [application, setApplication] = useState([]);
   const [loading, setLoading] = useState(false);
-  const handleLoading = () => setLoading((cur) => !cur);
   const [selectedFile, setSelectedFile] = useState(null);
   const [selectedCertificate, setSelectedCertificate] = useState(null);
   const [open, setOpen] = React.useState(false);
@@ -81,7 +77,64 @@ const TutorProfile = () => {
   const tutor = useSelector((state) => {
     if (state.user.userInfo.role === "tutor") return state.user.userInfo;
   });
-  console.log(tutor, "tutot from profile");
+  useEffect(() => {
+    const socket = new WebSocket("ws://localhost:8000/ws/adminnotification/");
+
+    socket.onopen = (event) => {
+      console.log("WebSocket connection opened:", event);
+    };
+
+    socket.onmessage = (event) => {
+      console.log("WebSocket message received:", event);
+
+      // Parse the message data if needed
+      const messageData = JSON.parse(event.data);
+      console.log(messageData, "message data");
+
+      // Show a notification
+      showNotification(messageData.message);
+    };
+
+    socket.onerror = (error) => {
+      console.error("WebSocket error:", error);
+    };
+
+    socket.onclose = (event) => {
+      console.log("WebSocket connection closed:", event);
+    };
+
+    // Function to show a notification
+    const showNotification = (message) => {
+      if ("Notification" in window) {
+        console.log(message, "message---------------------->>>>>");
+        const currentPermission = Notification.permission;
+
+        if (currentPermission === "granted") {
+          console.log(message, "message---------------------->>>>>");
+
+          // Permission already granted, create a notification
+          new Notification("New Message", {
+            body: message,
+          });
+        } else if (currentPermission !== "denied") {
+          // Permission not granted or denied, request it
+          Notification.requestPermission().then((permission) => {
+            console.log(message, "message---------------------->>>>>");
+
+            if (permission === "granted") {
+              // Permission granted, create a notification
+              new Notification("New Message", {
+                body: message,
+              });
+            }
+          });
+        }
+      }
+    };
+    return () => {
+      socket.close();
+    };
+  }, []);
   useEffect(() => {
     const fetchTutorProfile = async () => {
       try {
@@ -99,31 +152,32 @@ const TutorProfile = () => {
   if (user.length === 0) {
     return <Loader />;
   }
-  const apiUrl = `${BaseUrl}tutor/profileEdit/${user.id}/`;
-  const handleFormSubmit = (e) => {
+  const handleFormSubmit = async (e) => {
+    const apiUrl = `${BaseUrl}tutor/profileEdit/${user.id}/`;
     setLoading(true);
-    e.preventDefault();
-    const editProfile = new FormData();
-    if (imageChange) {
-      editProfile.append("profile_photo", imageChange);
-    }
-    editProfile.append("bio", bio ? bio : user.bio);
-    editProfile.append("user", user.user);
-    editProfile.append("is_certificate", user.is_certificate);
-    if (mobile || user.mobile) {
-      editProfile.append("mobile", mobile ? mobile : user.mobile);
-    }
-    editProfile.append(
-      "qualification",
-      qualification ? qualification : user.qualification
-    );
     try {
+      e.preventDefault();
+      const editProfile = new FormData();
+      if (imageChange.length !== 0) {
+        editProfile.append("profile_photo", imageChange);
+      }
+      editProfile.append("bio", bio ? bio : user.bio);
+      editProfile.append("user", user.user);
+      editProfile.append("is_certificate", user.is_certificate);
+      if (mobile || user.mobile) {
+        editProfile.append("mobile", mobile ? `+91${mobile}` : user.mobile);
+      }
+      editProfile.append(
+        "qualification",
+        qualification ? qualification : user.qualification
+      );
       axios.patch(apiUrl, editProfile).then((response) => {
         const res = response.data;
-        console.log(res.teacherData, "response");
-        setUser(res.teacherData);
-        handleClose();
-        toast.success(res.message);
+        if (res.status === 200) {
+          setUser(res.teacherData);
+          handleClose();
+          toast.success(res.message);
+        }
       });
     } catch (error) {
       console.log(error, "Error During Submission");
@@ -134,22 +188,23 @@ const TutorProfile = () => {
   const certificateApiUrl = `${BaseUrl}tutor/application_form/${user.id}/`;
 
   const handleCertificateSubmit = async (e) => {
+    handleCertificateClose();
     setLoading(true);
     e.preventDefault();
     const certificate = new FormData();
     if (certificateChange) {
       certificate.append("certificate", certificateChange);
       certificate.append("tutor", user.id);
-      handleSetChange();
     }
     try {
       await axios.post(certificateApiUrl, certificate).then((response) => {
         if (response.data.status === 200) {
-          setSelectedCertificate(null);
+          setSelectedCertificate([]);
           handleCertificateClose();
           toast.success(response.data.message);
+          setChange(!change);
         } else {
-          setSelectedCertificate(null);
+          setSelectedCertificate([]);
           toast.error(response.data.message);
         }
         handleCertificateClose();
@@ -186,6 +241,7 @@ const TutorProfile = () => {
       if (res.data.is_approved) {
         handleImageOpen();
       } else {
+        console.log(res.data);
         toast.error("Admin Want Approve your Certificate");
       }
 
@@ -200,8 +256,8 @@ const TutorProfile = () => {
 
   return (
     <>
-      {loading && <Loader />}
       <section style={{ backgroundColor: "#eee" }}>
+        {loading && <Loader />}
         <MDBContainer className="py-5">
           <MDBRow></MDBRow>
 
@@ -211,7 +267,7 @@ const TutorProfile = () => {
                 <MDBCardBody className="text-center">
                   {user.profile_photo ? (
                     <MDBCardImage
-                      src={`${BaseUrl}${user.profile_photo}`}
+                      src={user.profile_photo}
                       className="rounded-circle  mx-auto d-block "
                       style={{ width: "150px", height: "150px" }}
                       fluid
@@ -330,9 +386,16 @@ const TutorProfile = () => {
           </MDBRow>
         </MDBContainer>
 
-        <Dialog open={imageOpen} handler={handleImageOpen}>
+        <Dialog
+          open={imageOpen}
+          handler={handleImageOpen}
+          style={{
+            maxHeight: "100vh", // Set a maximum height for the modal
+            overflowY: "auto",
+          }}
+        >
           <DialogBody>
-            <img src={`${BaseUrl}${application.certificate}`} alt="hlo" />
+            <img src={application.certificate} alt="certificate-image" />
           </DialogBody>
           <DialogFooter>
             {/* <Button
@@ -387,6 +450,7 @@ const TutorProfile = () => {
             </form>
           </Box>
         </Modal>
+
         <Modal
           open={open}
           onClose={handleClose}
@@ -414,7 +478,7 @@ const TutorProfile = () => {
                     // Display the user's profile photo if no file is selected
                     <div className="relative">
                       <img
-                        src={`${BaseUrl}${user.profile_photo}`}
+                        src={user.profile_photo}
                         style={{ width: "100px", height: "100px" }}
                         alt="profile-image"
                       />

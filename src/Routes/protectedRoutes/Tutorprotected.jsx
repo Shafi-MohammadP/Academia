@@ -10,7 +10,7 @@ const Tutorprotected = () => {
 
   if (token) {
     const decodedToken = jwtDecode(token);
-    console.log(decodedToken, "Coverting from Tutor side");
+
     if (decodedToken.is_admin) {
       return <AdminRoutes />;
     } else {

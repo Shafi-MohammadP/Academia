@@ -21,9 +21,7 @@ const TutorRoutes = () => {
     if (!tutor) return;
     axios.get(`${BaseUrl}user/tutorProfile/${tutor.user_id}`).then((res) => {
       setUser(res.data);
-      console.log(res.data, "for teacher id");
     });
-    console.log(tutor, "tutor found");
   }, []);
   return (
     <>

@@ -3,6 +3,8 @@ import { Button } from "@material-tailwind/react";
 import { useSelector } from "react-redux";
 import { useDispatch } from "react-redux";
 import { resetEmail } from "../../redux/Email";
+import mail from "../../assets/mailImage.jpg";
+// import logo from "../../assets/Company_Logo.png";
 
 function EmailCheck() {
   const dispatch = useDispatch();
@@ -20,7 +22,12 @@ function EmailCheck() {
       <div className="grid grid-rows mt-48">
         <div className="container mx-auto grid grid-rows-[13rem,5rem,3rem,5rem,4rem] -mt-32">
           <div className="flex justify-center">
-            <img className="w-60" alt="" />
+            <img
+              className="w-60"
+              src={mail}
+              style={{ width: "full" }}
+              alt="mail image"
+            />
           </div>
           <div className="mt-5 flex justify-center">
             <p className="font-roboto-mono font-semibold sm:text-2xl text-xl">

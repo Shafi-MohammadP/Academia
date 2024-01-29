@@ -29,14 +29,13 @@ export function TutorStickyNavbar() {
   const tutor = useSelector((state) => {
     if (state.user.userInfo.role === "tutor") return state.user.userInfo;
   });
-  console.log(tutor, "navbaar");
+
   useEffect(() => {
     if (!tutor) return;
     if (!tutor_id) {
       axios.get(`${BaseUrl}user/tutorProfile/${tutor.user_id}`).then((res) => {
         setUser(res.data);
         dispatch(setTutor_id(res.data.id));
-        console.log(res.data, "navbar");
       });
     }
   }, []);

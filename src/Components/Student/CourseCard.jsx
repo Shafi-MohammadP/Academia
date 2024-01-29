@@ -8,7 +8,7 @@ import {
   Tooltip,
   IconButton,
 } from "@material-tailwind/react";
-import { BaseUrl } from "../../Constants/Constants";
+import { BaseUrl, imageBaseUrl } from "../../Constants/Constants";
 import { Link } from "@mui/material";
 import { Navigate, useNavigate } from "react-router-dom";
 import { useSelector } from "react-redux";
@@ -29,12 +29,8 @@ export default function CourseCard({ course }) {
       <CardHeader floated={false} color="blue-gray">
         {course.image && (
           <img
-            src={
-              course.image.includes(`${BaseUrl}`)
-                ? course.image
-                : BaseUrl + course.image
-            }
-            alt="ui/ux review check"
+            src={course.image}
+            alt="course_image"
             className="h-[250px] w-full"
           />
         )}

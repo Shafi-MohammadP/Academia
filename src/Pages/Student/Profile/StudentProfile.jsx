@@ -34,7 +34,7 @@ import axios from "axios";
 import { useSelector } from "react-redux/es/hooks/useSelector";
 // import { useLocation } from "react-router-dom";
 import { Loader } from "../../../Components/Loader/Loader";
-import { BaseUrl } from "../../../Constants/Constants";
+import { BaseUrl, imageBaseUrl } from "../../../Constants/Constants";
 // import { FaClosedCaptioning } from "react-icons/fa";
 import toast from "react-hot-toast";
 export default function StudentProfilePage() {
@@ -55,40 +55,36 @@ export default function StudentProfilePage() {
   const student = useSelector((state) => {
     if (state.user.userInfo.role === "student") return state.user.userInfo;
   });
-
-  // state
   const [bio, setBio] = useState("");
   const [mobile, setMobile] = useState("");
   const [qualification, setQualification] = useState("");
   const [imageChange, setImageChange] = useState([]);
 
-  // const [formData, setFormData] = useState({
-  //   bio: "",
-  //   mobile: "+91" + "",
-  //   qualification: "",
-  // });
-  // const handleChange = (e) => {
-  //   const { name, value } = e.target;
-  //   // profileEdit.append(name, value);
-  //   setFormData((prevData) => ({
-  //     ...prevData,
-  //     [name]: value,
-  //   }));
-  // };
-
-  const apiUrl = `${BaseUrl}student/profileEdit/${user.id}/`;
   const handleSubmit = (e) => {
+    const apiUrl = `${BaseUrl}student/profileEdit/${user.id}/`;
     setLoading(true);
     e.preventDefault();
+    const profileFormValidation = {
+      bio: bio ? bio : user.bio,
+      mobile: mobile ? mobile : user.mobile,
+      qualification: qualification ? qualification : user.qualification,
+    };
+    const isValid = Object.values(profileFormValidation).every(
+      (value) => value !== null && value.trim() !== ""
+    );
+    if (!isValid) {
+      toast.error("Field cannot be empty");
+      setLoading(false);
+      return;
+    }
     const EditProfile = new FormData();
-    console.log(imageChange, "length Coming....");
-    if (imageChange) {
+
+    if (imageChange.length !== 0) {
       EditProfile.append("profile_photo", imageChange);
-      console.log("working");
     }
     EditProfile.append("bio", bio ? bio : user.bio);
     if (mobile || user.mobile) {
-      EditProfile.append("mobile", mobile ? mobile : user.mobile);
+      EditProfile.append("mobile", mobile ? `+91${mobile}` : user.mobile);
     }
     EditProfile.append(
       "qualification",
@@ -97,13 +93,15 @@ export default function StudentProfilePage() {
     try {
       axios.patch(apiUrl, EditProfile).then((response) => {
         const data = response.data;
-        // console.log(data.userData, "sddddddddddsss");
-        // setUser(data.userData);
-        handlesetChange();
-        toast.success(data.message);
+        if (data.status === 200) {
+          handlesetChange();
+          toast.success(data.message);
+        } else {
+          toast.error(data.message);
+        }
       });
     } catch (error) {
-      console.log(error, "Error Founded");
+      console.error(error, "Error Founded");
     } finally {
       setLoading(false);
       handleClose();
@@ -121,11 +119,11 @@ export default function StudentProfilePage() {
   const handleFileChange = (event) => {
     // Handle the file change here
     imageAddFile = event.target.files[0];
+    console.log(imageAddFile, "image add file");
     setImageChange(imageAddFile);
     setSelectedFile(imageAddFile);
     // Add logic to update the user's profile photo with the selected file
   };
-  console.log(imageChange, "imageeee");
 
   useEffect(() => {
     if (!student) return;
@@ -139,7 +137,6 @@ export default function StudentProfilePage() {
             `http://127.0.0.1:8000/user/studentProfile/${student.user_id}/`
           );
           setUser(response.data);
-          console.log(response.data, "Backend Data");
         }
       } catch (error) {
         console.error("Error fetching data:", error);
@@ -156,7 +153,7 @@ export default function StudentProfilePage() {
   const handleProfileImage = () => {
     fileInputProfileRef.current.click();
   };
-  // console.log(formData, "lotttttttttttttaa");
+
   return (
     <>
       {loading && <Loader />}
@@ -169,7 +166,7 @@ export default function StudentProfilePage() {
                 <MDBCardBody className="text-center">
                   {user.profile_photo ? (
                     <MDBCardImage
-                      src={`${BaseUrl}${user.profile_photo}`}
+                      src={user.profile_photo}
                       alt={user.student_details.username}
                       className="rounded-circle  mx-auto d-block "
                       style={{ width: "150px", height: "150px" }}
@@ -288,7 +285,7 @@ export default function StudentProfilePage() {
                     // Display the user's profile photo if no file is selected
                     <div className="relative">
                       <img
-                        src={`${BaseUrl}${user.profile_photo}`}
+                        src={user.profile_photo}
                         style={{ width: "100px", height: "100px" }}
                         alt="profile-image"
                       />
@@ -320,6 +317,7 @@ export default function StudentProfilePage() {
                 </div>
               )}
             </div>
+
             <form
               class="max-w-screen-lg mt-8 mb-2 w-80 sm:w-96"
               encType="multipart/form-data"

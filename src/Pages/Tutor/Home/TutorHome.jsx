@@ -17,7 +17,6 @@ const TutorHome = () => {
       .then((res) => {
         if (Array.isArray(res.data)) {
           setCourses(res.data);
-          console.log(res.data, "individual coming");
         } else {
           console.error("Data is not an array:", res.data);
         }
@@ -49,16 +48,11 @@ const TutorHome = () => {
       <div className="container">
         <h3 className="">Your Courses</h3>
         <div className=" flex flex-wrap mt-8 gap-4">
-          {courses.map(
-            (course, i) => (
-              console.log(course),
-              (
-                <>
-                  <CourseCard key={i} course={course} />
-                </>
-              )
-            )
-          )}
+          {courses.map((course, i) => (
+            <>
+              <CourseCard key={i} course={course} />
+            </>
+          ))}
         </div>
       </div>
     </>

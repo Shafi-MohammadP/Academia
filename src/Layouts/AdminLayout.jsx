@@ -9,24 +9,27 @@ import { BiBell } from "react-icons/bi";
 import { useEffect, useState } from "react";
 import { BaseUrl } from "../Constants/Constants";
 import axios from "axios";
+import { Loader } from "../Components/Loader/Loader";
+import { useDispatch, useSelector } from "react-redux";
+import { setNotifications } from "../redux/User";
 // import { useNavigate } from "react-router-dom";
 
 const AdminLayout = () => {
+  const { notifications } = useSelector((state) => state.user);
   const [certificate, setCertificate] = useState([]);
+  const [notification, setNotification] = useState([]);
   const navigate = useNavigate();
   useEffect(() => {
-    try {
-      axios.get(`${BaseUrl}dashboard/certificateList/`).then((response) => {
-        setCertificate(response.data);
-      });
-    } catch (err) {
-      console.log(err, "Error During fetching Certificate");
-    }
-  }, []);
+    const apiUrl = `${BaseUrl}notifications/notification/`;
+    axios.get(apiUrl).then((res) => {
+      setNotification(res.data);
+    });
+  }, [notifications]);
+
   const handleClick = () => {
     console.log("something");
-    navigate("/admin/certificateManagement/", {
-      state: { certificateData: certificate },
+    navigate("/admin/notification_management/", {
+      state: { notificationData: notification },
     });
   };
   return (
@@ -42,14 +45,14 @@ const AdminLayout = () => {
                   <span className="text-green-900">ACADEMIA</span>
                 </Typography>
                 <div className="relative">
-                  {certificate.length > 0 ? (
+                  {notification.length > 0 ? (
                     <>
                       <BiBell
                         className="h-8 w-8 text-blue-gray cursor-pointer"
                         onClick={handleClick}
                       />
                       <span className="absolute top-0 -right-[1px] h-4 w-4 inline-block bg-red-500 text-center text-white rounded-full text-xs">
-                        {certificate.length}
+                        {notification.length}
                       </span>
                     </>
                   ) : (
