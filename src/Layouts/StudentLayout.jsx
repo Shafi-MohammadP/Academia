@@ -1,9 +1,10 @@
 import React from "react";
-// import Head from "../Components/header/Head";
+import Head from "../Components/header/Head";
 import { Outlet } from "react-router-dom";
-import { StickyNavbar } from "../Components/Navbar/Navbar";
-import DemoNavbar from "../Components/Demo/DemoNavbar";
+// import { StickyNavbar } from "../Components/Navbar/Navbar";
+// import DemoNavbar from "../Components/Demo/DemoNavbar";
 import StudentNavbar from "../Components/Navbar/StudentNavbar";
+import Footer from "../Components/common/footer/Footer";
 
 const StudentLayout = () => {
   return (
@@ -12,8 +13,10 @@ const StudentLayout = () => {
         {/* <Head /> */}
         {/* <StickyNavbar /> */}
         {/* <DemoNavbar /> */}
-        <StudentNavbar />
+        {/* <StudentNavbar /> */}
+        <Head />
         <Outlet />
+        <Footer />
       </div>
     </>
   );

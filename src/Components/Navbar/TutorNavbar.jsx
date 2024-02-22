@@ -134,9 +134,13 @@ export function TutorStickyNavbar() {
           <Link to={"/tutor"}>
             <a href="">Home</a>
           </Link>
-          <a href="">My work</a>
+          <Link to={"/tutor/my-courses/"}>
+            <a href="">My Course</a>
+          </Link>
           <a href="">Blog</a>
-          <a href="">About me</a>
+          <Link to={"about-us/"}>
+            <a href="">About Us</a>
+          </Link>
           {/* <a href="/tutor/applicationform">Add Course</a> */}
           <Link to={`/tutor/applicationform/`}>Add Course</Link>
 
@@ -149,13 +153,13 @@ export function TutorStickyNavbar() {
         <button className="nav-btn" onClick={showNavbar}>
           <FaBars />
         </button>
-        <div className="flex items-center justify-between">
+        {/* <div className="flex items-center justify-between">
           <Input
             type="text"
             placeholder="Search"
             className="p-2 border rounded-md focus:outline-none focus:border-blue-500 w-full" // Add w-full class for full width
           />
-        </div>
+        </div> */}
 
         {tutor ? (
           <div className="relative">
@@ -164,6 +168,7 @@ export function TutorStickyNavbar() {
               <FontAwesomeIcon
                 icon={faUser}
                 className="user cursor-pointer w-12 h-6"
+                title="profile"
               />
             </div>
 
@@ -172,14 +177,24 @@ export function TutorStickyNavbar() {
               <div className="absolute top-12 right-0 mt-2 bg-white border rounded shadow-md z-10 w-48">
                 <ul>
                   <li>
-                    <Link to={"/tutor/tutorprofile"} onClick={toggleDropdown}>
+                    <i class="ri-user-line"></i>
+                    <Link
+                      to={"/tutor/tutorprofile"}
+                      onClick={toggleDropdown}
+                      style={{ textDecoration: "None", color: "black" }}
+                    >
                       {" "}
                       Profile
                     </Link>
                   </li>
                   <li>
                     {/* Add your logout functionality here */}
-                    <a href="" onClick={() => logoutUser()}>
+                    <i class="ri-logout-box-r-line"></i>
+                    <a
+                      href=""
+                      onClick={() => logoutUser()}
+                      style={{ textDecoration: "None", color: "black" }}
+                    >
                       Log out
                     </a>
                   </li>

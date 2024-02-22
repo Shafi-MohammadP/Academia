@@ -4,6 +4,10 @@ import CourseCard from "../../../Components/Student/CourseCard";
 import { BaseUrl } from "../../../Constants/Constants";
 import axios from "axios";
 import { useSelector } from "react-redux";
+import HeroSection from "../../../Components/Hero-Section/HeroSection";
+import Features from "../../../Components/Student/Feature-Section/Futures";
+import AboutUs from "../../../Components/common/about-us/AboutUs";
+import AllCourses from "../../Student/all-courses/AllCourses";
 
 const TutorHome = () => {
   const tutor = useSelector((state) => {
@@ -27,7 +31,9 @@ const TutorHome = () => {
   }, []);
   return (
     <>
-      <div className="bg-[#F8F8F8] p-6">
+      <HeroSection />
+      <AllCourses />
+      {/* <div className="bg-[#F8F8F8] p-6">
         <div className="container mx-auto">
           <div className="text-2xl">
             <h3 className="mb-4 text-black">Welcome To Academia</h3>
@@ -54,7 +60,9 @@ const TutorHome = () => {
             </>
           ))}
         </div>
-      </div>
+      </div> */}
+      <Features />
+      <AboutUs />
     </>
   );
 };

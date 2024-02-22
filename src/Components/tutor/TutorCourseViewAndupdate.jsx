@@ -1,7 +1,7 @@
 import React from "react";
 import { useEffect, useState } from "react";
 import { BaseUrl } from "../../Constants/Constants";
-import { useParams } from "react-router-dom";
+import { useLocation, useParams } from "react-router-dom";
 import axios from "axios";
 import { Loader } from "../Loader/Loader";
 import { Button } from "@material-tailwind/react";
@@ -45,6 +45,9 @@ const style = {
   p: 4,
 };
 const TutorCoursesView = () => {
+  const location = useLocation();
+  const course = location.state.course;
+  console.log(course, "tutor course");
   const tutor = useSelector((state) => {
     if (state.user.userInfo.role === "tutor") return state.user.userInfo;
   });
@@ -80,7 +83,7 @@ const TutorCoursesView = () => {
     is_free: false,
   });
 
-  const { id } = useParams();
+  const { id } = course.id;
   // modal states
   const [open, setOpen] = useState(false);
   const [videOpen, setVideoOpen] = useState(false);
@@ -191,7 +194,7 @@ const TutorCoursesView = () => {
   const handleVideoAddingSubmit = async () => {
     handleClose();
     setLoading(true);
-    const apiUrl = `${BaseUrl}course/videoAdding/${id}/`;
+    const apiUrl = `${BaseUrl}course/videoAdding/${course.id}/`;
     const videoFormValidations = {
       video_title: title,
       video_description: videoDescription,
@@ -219,7 +222,7 @@ const TutorCoursesView = () => {
       return;
     }
     const videoForm = new FormData();
-    videoForm.append("course_id", id);
+    videoForm.append("course_id", course.id);
     videoForm.append("video_title", title);
     videoForm.append("video_description", videoDescription);
     videoForm.append("thumbnail_image", selectedImage);
@@ -276,10 +279,10 @@ const TutorCoursesView = () => {
   const handleVideoEditSubmit = async () => {
     handleCloseModalEdit();
     setLoading(true);
+    console.log(videoInfo.id, "id comingggggggggggg");
     const videoApiUrl = `${BaseUrl}tutor/course_video/${videoInfo.id}/`;
-
     const EditVideoForm = new FormData();
-    EditVideoForm.append("video_id", id || videoInfo.id);
+    EditVideoForm.append("video_id", course.id || videoInfo.id);
     EditVideoForm.append("video_title", title || videoInfo.video_title);
     EditVideoForm.append(
       "video_description",
@@ -324,8 +327,8 @@ const TutorCoursesView = () => {
   };
 
   useEffect(() => {
-    const courseApiUrl = `${BaseUrl}course/courseDetailview/${id}/`;
-    const videoApiUrl = `${BaseUrl}tutor/course_video/${id}/`;
+    const courseApiUrl = `${BaseUrl}course/courseDetailview/${course.id}/`;
+    const videoApiUrl = `${BaseUrl}tutor/course_video/${course.id}/`;
     try {
       axios.get(courseApiUrl).then((res) => {
         setCourseDetailView(res.data);

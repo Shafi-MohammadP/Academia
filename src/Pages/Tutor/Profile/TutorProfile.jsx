@@ -154,7 +154,15 @@ const TutorProfile = () => {
   }
   const handleFormSubmit = async (e) => {
     const apiUrl = `${BaseUrl}tutor/profileEdit/${user.id}/`;
+    handleClose();
+
     setLoading(true);
+    if ((mobile && mobile.length < 10) || mobile.length > 10) {
+      toast.error("Enter a valid mobile number");
+      setMobile("");
+      setLoading(false);
+      return;
+    }
     try {
       e.preventDefault();
       const editProfile = new FormData();
@@ -174,8 +182,11 @@ const TutorProfile = () => {
       axios.patch(apiUrl, editProfile).then((response) => {
         const res = response.data;
         if (res.status === 200) {
+          setImageChange([]);
+          setBio("");
+          setQualification("");
+          setMobile("");
           setUser(res.teacherData);
-          handleClose();
           toast.success(res.message);
         }
       });
@@ -577,6 +588,7 @@ const TutorProfile = () => {
                     placeholder={
                       user.mobile ? user.mobile : "Enter Your Mobile Number"
                     }
+                    type="number"
                     name="mobile"
                     value={mobile}
                     onChange={(e) => setMobile(e.target.value)}

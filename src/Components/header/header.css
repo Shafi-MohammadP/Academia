@@ -1,8 +1,7 @@
 .header {
   width: 100%;
   height: 80px;
-  line-height: 80px;
-  background-color: aqua;
+  background-color: #c7e2e6;
 }
 
 .nav__list {
@@ -31,6 +30,9 @@
   font-size: 1.1rem;
 }
 
+.nav__right ul {
+  line-height: 30px;
+}
 .nav__right p i {
   font-size: 1.3rem;
 }
@@ -80,5 +82,6 @@
 
   .active__menu {
     display: block;
+    line-height: 80px;
   }
 }
