@@ -12,6 +12,7 @@ import toast from "react-hot-toast";
 import { Textarea, Typography, rating } from "@material-tailwind/react";
 import { Box } from "@mui/material";
 import { IoCloseCircleSharp } from "react-icons/io5";
+import Rating from "@mui/material/Rating";
 import StarRating from "../../../Components/common/rating-page/StarRating";
 const style = {
   position: "absolute",
@@ -285,9 +286,13 @@ const PurchaseCourse = () => {
               encType="multipart/form-data"
               onSubmit={() => handleReviewSubmit("")}
             >
-              <StarRating
+              {/* <StarRating
                 rating={rating}
                 onRatingChange={(newRating) => setNewRating(newRating)}
+              /> */}
+              <Rating
+                rating={rating}
+                onDurationChange={(newRating) => setNewRating(newRating)}
               />
               <Textarea
                 placeholder={user.review ? user.review : "Enter Your Review"}
@@ -305,7 +310,6 @@ const PurchaseCourse = () => {
             </Form>
           </Box>
         </Modal>
-       
       </section>
     </>
   );

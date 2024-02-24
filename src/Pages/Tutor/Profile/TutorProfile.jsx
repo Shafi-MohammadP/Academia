@@ -47,10 +47,23 @@ import { faCamera } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import toast from "react-hot-toast";
 const TutorProfile = () => {
+  const instructions = [
+    "Encourage Participation: Remind students to actively participate in class discussions and ask questions.",
+    "Provide Real-World Examples: Incorporate real-world examples to make the concepts more relatable.",
+    "Use Multimedia: Utilize multimedia resources such as images, videos, or interactive presentations.",
+    "Set Clear Expectations: Clearly communicate expectations regarding assignments, deadlines, and assessment criteria.",
+    "Encourage Critical Thinking: Challenge students to think critically and analyze information.",
+    "Offer Feedback Constructively: Provide constructive feedback on assignments, highlighting strengths and suggesting areas for improvement.",
+    "Establish a Routine: Help students establish a consistent study routine for better time management.",
+    "Promote Collaboration: Encourage collaboration among students through group projects or discussions.",
+    "Stay Accessible: Let students know about your availability for questions or additional assistance.",
+    "Celebrate Achievements: Acknowledge and celebrate students' achievements, both big and small.",
+  ];
   const [change, setChange] = useState(false);
 
   const [user, setUser] = useState([]);
   const [openCertificate, setOpenCertificate] = useState(false);
+  const [studentList, setStudentList] = useState([]);
   const handleCertificateClose = () => setOpenCertificate(false);
   const handleCertificateOpen = () => setOpenCertificate(!open);
   const [application, setApplication] = useState([]);
@@ -77,86 +90,74 @@ const TutorProfile = () => {
   const tutor = useSelector((state) => {
     if (state.user.userInfo.role === "tutor") return state.user.userInfo;
   });
-  useEffect(() => {
-    const socket = new WebSocket("ws://localhost:8000/ws/adminnotification/");
+  // useEffect(() => {
+  //   const socket = new WebSocket("ws://localhost:8000/ws/adminnotification/");
 
-    socket.onopen = (event) => {
-      console.log("WebSocket connection opened:", event);
-    };
+  //   socket.onopen = (event) => {
+  //     console.log("WebSocket connection opened:", event);
+  //   };
 
-    socket.onmessage = (event) => {
-      console.log("WebSocket message received:", event);
+  //   socket.onmessage = (event) => {
+  //     console.log("WebSocket message received:", event);
 
-      // Parse the message data if needed
-      const messageData = JSON.parse(event.data);
-      console.log(messageData, "message data");
+  //     // Parse the message data if needed
+  //     const messageData = JSON.parse(event.data);
+  //     console.log(messageData, "message data");
 
-      // Show a notification
-      showNotification(messageData.message);
-    };
+  //     // Show a notification
+  //     showNotification(messageData.message);
+  //   };
 
-    socket.onerror = (error) => {
-      console.error("WebSocket error:", error);
-    };
+  //   socket.onerror = (error) => {
+  //     console.error("WebSocket error:", error);
+  //   };
 
-    socket.onclose = (event) => {
-      console.log("WebSocket connection closed:", event);
-    };
+  //   socket.onclose = (event) => {
+  //     console.log("WebSocket connection closed:", event);
+  //   };
 
-    // Function to show a notification
-    const showNotification = (message) => {
-      if ("Notification" in window) {
-        console.log(message, "message---------------------->>>>>");
-        const currentPermission = Notification.permission;
+  //   // Function to show a notification
+  //   const showNotification = (message) => {
+  //     if ("Notification" in window) {
+  //       console.log(message, "message---------------------->>>>>");
+  //       const currentPermission = Notification.permission;
 
-        if (currentPermission === "granted") {
-          console.log(message, "message---------------------->>>>>");
+  //       if (currentPermission === "granted") {
+  //         console.log(message, "message---------------------->>>>>");
 
-          // Permission already granted, create a notification
-          new Notification("New Message", {
-            body: message,
-          });
-        } else if (currentPermission !== "denied") {
-          // Permission not granted or denied, request it
-          Notification.requestPermission().then((permission) => {
-            console.log(message, "message---------------------->>>>>");
+  //         // Permission already granted, create a notification
+  //         new Notification("New Message", {
+  //           body: message,
+  //         });
+  //       } else if (currentPermission !== "denied") {
+  //         // Permission not granted or denied, request it
+  //         Notification.requestPermission().then((permission) => {
+  //           console.log(message, "message---------------------->>>>>");
 
-            if (permission === "granted") {
-              // Permission granted, create a notification
-              new Notification("New Message", {
-                body: message,
-              });
-            }
-          });
-        }
-      }
-    };
-    return () => {
-      socket.close();
-    };
-  }, []);
-  useEffect(() => {
-    const fetchTutorProfile = async () => {
-      try {
-        const response = await axios.get(
-          `http://127.0.0.1:8000/user/tutorProfile/${tutor.user_id}/`
-        );
-        setUser(response.data);
-        console.log(response.data, "backendddd");
-      } catch (err) {
-        console.log(err, "error founddd");
-      }
-    };
-    fetchTutorProfile();
-  }, []);
-  if (user.length === 0) {
-    return <Loader />;
-  }
+  //           if (permission === "granted") {
+  //             // Permission granted, create a notification
+  //             new Notification("New Message", {
+  //               body: message,
+  //             });
+  //           }
+  //         });
+  //       }
+  //     }
+  //   };
+  //   return () => {
+  //     socket.close();
+  //   };
+  // }, []);
+
   const handleFormSubmit = async (e) => {
     const apiUrl = `${BaseUrl}tutor/profileEdit/${user.id}/`;
-    handleClose();
-
     setLoading(true);
+    handleClose();
+    if (bio === null || qualification === null || mobile === null) {
+      toast.error("field cannot be empty");
+      setLoading(false);
+      return;
+    }
     if ((mobile && mobile.length < 10) || mobile.length > 10) {
       toast.error("Enter a valid mobile number");
       setMobile("");
@@ -199,14 +200,20 @@ const TutorProfile = () => {
   const certificateApiUrl = `${BaseUrl}tutor/application_form/${user.id}/`;
 
   const handleCertificateSubmit = async (e) => {
+    e.preventDefault();
     handleCertificateClose();
     setLoading(true);
-    e.preventDefault();
     const certificate = new FormData();
-    if (certificateChange) {
+    console.log(certificateChange, "change");
+    if (certificateChange.length !== 0) {
       certificate.append("certificate", certificateChange);
       certificate.append("tutor", user.id);
+    } else {
+      toast.error("image cannot be empty");
+      setLoading(false);
+      return;
     }
+    console.log(certificate, "certificate");
     try {
       await axios.post(certificateApiUrl, certificate).then((response) => {
         if (response.data.status === 200) {
@@ -265,6 +272,34 @@ const TutorProfile = () => {
     setShowModal(false);
   };
 
+  useEffect(() => {
+    const fetchTutorProfile = async () => {
+      try {
+        const response = await axios.get(
+          `http://127.0.0.1:8000/user/tutorProfile/${tutor.user_id}/`
+        );
+        setUser(response.data);
+      } catch (err) {
+        console.log(err, "error found");
+      }
+    };
+
+    const apiUrl = `${BaseUrl}tutor/purchased_student/${tutor.id}/`;
+    async function fetchStudentDetails() {
+      try {
+        const response = await axios.get(apiUrl);
+        setStudentList(response.data);
+        console.log(response.data, "data");
+      } catch (err) {
+        console.error(err, "error in student details");
+      }
+    }
+    fetchTutorProfile();
+    fetchStudentDetails();
+  }, []);
+  if (user.length === 0) {
+    return <Loader />;
+  }
   return (
     <>
       <section style={{ backgroundColor: "#eee" }}>
@@ -308,6 +343,38 @@ const TutorProfile = () => {
                       </MDBBtn>
                     )}
                   </div>
+                </MDBCardBody>
+              </MDBCard>
+              <MDBCard className="mb-4">
+                <MDBCardBody className="">
+                  <p className="txt text-center">Student List</p>
+                  <table className="table">
+                    <thead>
+                      <tr>
+                        <th>Name</th>
+                        <th>Course</th>
+                        <th>Date</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {studentList.length !== 0 ? (
+                        studentList.map((student, index) => (
+                          <tr key={index}>
+                            <td>{student.student.student_details.username}</td>
+                            <td>{student.course.course_name}</td>
+                            <td style={{ whiteSpace: "nowrap" }}>
+                              {student.created_at}
+                            </td>
+                          </tr>
+                        ))
+                      ) : (
+                        <tr>
+                          <td colSpan="3">No students available</td>
+                        </tr>
+                      )}
+                    </tbody>
+                  </table>
+                  <hr />
                 </MDBCardBody>
               </MDBCard>
             </MDBCol>
@@ -371,6 +438,17 @@ const TutorProfile = () => {
                         </MDBCardText>
                       </MDBCol>
                     </MDBRow>
+                    <hr />
+                    <MDBRow>
+                      <MDBCol sm="3">
+                        <MDBCardText>Wallet</MDBCardText>
+                      </MDBCol>
+                      <MDBCol sm="9">
+                        <MDBCardText className="text-muted">
+                          {user.wallet}
+                        </MDBCardText>
+                      </MDBCol>
+                    </MDBRow>
                     {user.is_certificate && (
                       <>
                         <hr />
@@ -392,6 +470,18 @@ const TutorProfile = () => {
                     )}
                   </MDBCardBody>
                 )}
+              </MDBCard>
+              <MDBCard>
+                <MDBCardBody>
+                  <h3 className="text-center">instructions</h3>
+                  <ul>
+                    {instructions.map((instruction, index) => (
+                      <li style={{ listStyle: "disc" }} key={index}>
+                        {instruction}
+                      </li>
+                    ))}
+                  </ul>
+                </MDBCardBody>
               </MDBCard>
             </MDBCol>
           </MDBRow>
@@ -435,7 +525,11 @@ const TutorProfile = () => {
             <div className="w-full flex justify-center">
               {selectedCertificate ? (
                 <img
-                  src={URL.createObjectURL(selectedCertificate)}
+                  src={
+                    selectedCertificate instanceof File
+                      ? URL.createObjectURL(selectedCertificate)
+                      : null
+                  }
                   style={{
                     width: "100px",
                     height: "100px",

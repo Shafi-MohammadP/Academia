@@ -22,9 +22,9 @@ const AllCourses = () => {
     };
     fetchAllCourse();
   }, []);
-  if (allCourses.length === 0) {
-    return <Loader />;
-  }
+  // if (allCourses.length === 0) {
+  //   return <Loader />;
+  // }
   return (
     <>
       <section>

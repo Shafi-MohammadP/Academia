@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { commonSignupurl } from "../../Constants/Constants";
 import axios from "axios";
@@ -8,11 +8,13 @@ import { useFormik } from "formik";
 import * as Yup from "yup";
 import { useDispatch } from "react-redux";
 import { setUseremail } from "../../redux/Email";
+import { Loader } from "../Loader/Loader";
 
 const userSignUp = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const cl = console.log.bind(console);
+  const [loading, setLoading] = useState(false);
   const initialState = {
     username: "",
     email: "",
@@ -25,6 +27,7 @@ const userSignUp = () => {
       initialValues: initialState,
       validationSchema: SignupValidationSchema,
       onSubmit: async (values) => {
+        setLoading(true);
         try {
           console.log(
             values,
@@ -47,6 +50,8 @@ const userSignUp = () => {
         } catch (error) {
           console.error("Errro during Sign up", error);
           toast.error(error);
+        } finally {
+          setLoading(false);
         }
       },
     });
@@ -108,6 +113,7 @@ const userSignUp = () => {
   //   };
   return (
     <>
+      {loading && <Loader />}
       <div className="grid grid-cols-1 sm:grid-cols-2">
         <div className="hidden sm:block">
           <img

@@ -7,7 +7,7 @@ const TutorCourseCards = ({ item }) => {
   const handleClick = () => {
     navigate("courseUpdate/", { state: { course: item } });
   };
-  console.log(item);
+  console.log(item, "item");
   return (
     <div className="single__course__item">
       <div className="course__img">
@@ -19,17 +19,17 @@ const TutorCourseCards = ({ item }) => {
 
         <div className=" d-flex justify-content-between align-items-center">
           <p className="lesson d-flex align-items-center gap-1">
-            <i class="ri-book-open-line"></i> {} Lessons
+            <i class="ri-book-open-line"></i> {item.video_count} Lessons
           </p>
 
           <p className="students d-flex align-items-center gap-1">
-            <i class="ri-user-line"></i> {""}K
+            <i class="ri-user-line"></i> {item.student_count} students
           </p>
         </div>
 
         <div className=" d-flex justify-content-between align-items-center">
           <p className="rating d-flex align-items-center gap-1">
-            <i class="ri-star-fill"></i> {""}K
+            <i class="ri-star-fill"></i> {item.average_rating}K
           </p>
 
           <p className="enroll d-flex align-items-center gap-1">

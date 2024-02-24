@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate, useParams } from "react-router-dom";
 import { Link } from "react-router-dom";
 import { Button } from "@material-tailwind/react";
 import { loginUrl, GoogleLoginUrl, BaseUrl } from "../../Constants/Constants";
@@ -20,6 +20,15 @@ const CommonLogin = () => {
   const cl = console.log.bind(console);
   const [showSignUpOptions, setShowSignUpOptions] = useState(false);
   const dispatch = useDispatch();
+  const location = useLocation();
+  const queryParams = new URLSearchParams(location.search);
+  const message = queryParams.get("message");
+
+  useEffect(() => {
+    if (message) {
+      toast.success(message);
+    }
+  }, [message]);
   useEffect(() => {
     const googleAuth = async () => {
       try {

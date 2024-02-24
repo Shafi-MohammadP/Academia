@@ -72,7 +72,7 @@ const CourseDetailView = () => {
     }
   };
   const checkPurchased = (event) => {
-    const checked = purchaseList.find((obj) => obj.course === event);
+    const checked = purchaseList.find((obj) => obj.course.id === event);
     // if (checked) {
     //   setPurchased(true);
     // }

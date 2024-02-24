@@ -18,6 +18,7 @@ import { Loader } from "../Loader/Loader";
 export function TutorStickyNavbar() {
   const [user, setUser] = useState([]);
   const dispatch = useDispatch();
+  const [certificate, setCertificate] = useState(false);
   const navRef = useRef();
   const [isDropdownVisible, setDropdownVisible] = useState(false);
   const { tutor_id } = useSelector((state) => state.user);
@@ -31,10 +32,12 @@ export function TutorStickyNavbar() {
   });
 
   useEffect(() => {
+    console.log("componenent mounded");
     if (!tutor) return;
     if (!tutor_id) {
       axios.get(`${BaseUrl}user/tutorProfile/${tutor.user_id}`).then((res) => {
         setUser(res.data);
+        console.log(res.data, "datass");
         dispatch(setTutor_id(res.data.id));
       });
     }
@@ -125,6 +128,15 @@ export function TutorStickyNavbar() {
   //     </Typography>
   //   </ul>
   // );
+  useEffect(() => {
+    const apiUrl = `${BaseUrl}tutor/certificate_confirmation/${tutor.id}/`;
+    const fetchCertificate = async () => {
+      const response = await axios.get(apiUrl);
+      setCertificate(response.data.message);
+    };
+    fetchCertificate();
+    return () => {};
+  }, []);
 
   return (
     <>
@@ -142,7 +154,11 @@ export function TutorStickyNavbar() {
             <a href="">About Us</a>
           </Link>
           {/* <a href="/tutor/applicationform">Add Course</a> */}
-          <Link to={`/tutor/applicationform/`}>Add Course</Link>
+          {certificate ? (
+            <Link to={`/tutor/applicationform/`}>Add Course</Link>
+          ) : (
+            ""
+          )}
 
           {/* Move the Button with FontAwesome icon to the end of the nav element */}
 

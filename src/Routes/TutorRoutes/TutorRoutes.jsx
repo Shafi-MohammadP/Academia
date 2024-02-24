@@ -14,6 +14,7 @@ import TutorCoursesView from "../../Components/tutor/TutorCourseViewAndupdate";
 import TutorCourses from "../../Pages/Tutor/my-courses/TutorCourses";
 import AboutUs from "../../Components/common/about-us/AboutUs";
 import CourseDetailView from "../../Pages/Student/course-detail-view/CourseDetailView";
+import TutorVideoShow from "../../Components/tutor/tutor_video_show/TutorVideoShow";
 
 const TutorRoutes = () => {
   const [user, setUser] = useState([]);
@@ -92,16 +93,21 @@ const TutorRoutes = () => {
         <Route element={<Tutorprotected />}>
           <Route path="/" element={<TutorLayout />}>
             <Route index element={<TutorHome />} />
-            <Route path="/my-courses/" element={<TutorCourses />} />
+            <Route path="/my-courses/*" element={<TutorCourses />} />
             <Route path="tutorprofile" element={<TutorProfile />} />
             <Route path="courseView/" element={<CourseDetailView />} />
 
             <Route
-              path="my-courses/courseUpdate/"
+              path="my-courses/courseUpdate/*"
               element={<TutorCoursesView />}
             />
             <Route path="applicationform/" element={<ApplicationForm />} />
             <Route path="about-us/" element={<AboutUs />} />
+            <Route
+              path="my-courses/courseUpdate/tutor_video_show/"
+              // path="tutor_video_show/"
+              element={<TutorVideoShow />}
+            />
           </Route>
         </Route>
       </Routes>

@@ -54,6 +54,7 @@ function TutorCoursesDetails() {
       .catch((error) => {
         console.error("Error fetching courses:", error);
       });
+    const videoApiUrl = `${BaseUrl}`;
   }, []);
 
   return (
@@ -74,6 +75,7 @@ function TutorCoursesDetails() {
           ))}
         </Row>
       </Container>
+      <Container></Container>
     </section>
   );
 }

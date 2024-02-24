@@ -1,7 +1,7 @@
 import React from "react";
 import { useEffect, useState } from "react";
 import { BaseUrl } from "../../Constants/Constants";
-import { useLocation, useParams } from "react-router-dom";
+import { useLocation, useNavigate, useParams } from "react-router-dom";
 import axios from "axios";
 import { Loader } from "../Loader/Loader";
 import { Button } from "@material-tailwind/react";
@@ -31,6 +31,8 @@ import Fade from "@mui/material/Fade";
 import Checkbox from "@mui/material/Checkbox";
 import FormControlLabel from "@mui/material/FormControlLabel";
 import toast from "react-hot-toast";
+import { Container } from "reactstrap";
+import ReviewList from "../common/review-list/ReviewList";
 const style = {
   position: "absolute",
   top: "50%",
@@ -45,12 +47,13 @@ const style = {
   p: 4,
 };
 const TutorCoursesView = () => {
-  const location = useLocation();
-  const course = location.state.course;
-  console.log(course, "tutor course");
   const tutor = useSelector((state) => {
     if (state.user.userInfo.role === "tutor") return state.user.userInfo;
   });
+  const location = useLocation();
+  const course = location.state.course;
+  console.log(course, "tutor course");
+  const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
   const [courseDetails, setCourseDetailView] = useState([]);
   const [videoDetails, setVideoDetails] = useState([]);
@@ -346,7 +349,12 @@ const TutorCoursesView = () => {
       console.error("error during fetching video");
     }
   }, [change]);
-
+  const handleVideoShow = (event) => {
+    console.log(event);
+    navigate("tutor_video_show/", {
+      state: { videoDetails: event },
+    });
+  };
   useEffect(() => {
     const socket = new WebSocket("ws://localhost:8000/ws/adminnotification/");
 
@@ -478,7 +486,11 @@ const TutorCoursesView = () => {
               </h2>
               {videoDetails.map((video_details, index) => (
                 <div className="flex gap-16 p-2 border rounded-md h-52">
-                  <div key={index} className="relative ">
+                  <div
+                    key={index}
+                    className="relative "
+                    onClick={() => handleVideoShow(video_details)}
+                  >
                     <img
                       className="h-full w-96"
                       src={video_details.thumbnail_image}
@@ -638,6 +650,12 @@ const TutorCoursesView = () => {
           </CardActions>
         </Card>
       </Dialog>
+      <Container>
+        <div className="flex justify-center items-center">
+          <h3> Course Reviews</h3>
+        </div>
+        <ReviewList courseId={course.id} />
+      </Container>
       <>
         <Modal
           aria-labelledby="transition-modal-title"
