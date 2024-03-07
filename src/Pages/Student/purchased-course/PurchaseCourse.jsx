@@ -86,6 +86,7 @@ const PurchaseCourse = () => {
   };
   const handleReviewSubmit = async (event) => {
     handleClose();
+    console.log(newRating, review, "pppp");
     if (newRating === 0 || review === "") {
       toast.error("Field cannot be empty");
       return;

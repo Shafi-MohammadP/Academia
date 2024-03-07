@@ -129,7 +129,7 @@ const TutorSignup = () => {
                 onBlur={handleBlur}
                 type="password"
                 name="password2"
-                placeholder="Confirm Pasword"
+                placeholder="Confirm Password"
               />
               {errors.password2 && touched.password2 && (
                 <span className="font-light  text-red-500">

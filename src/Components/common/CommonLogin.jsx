@@ -23,12 +23,38 @@ const CommonLogin = () => {
   const location = useLocation();
   const queryParams = new URLSearchParams(location.search);
   const message = queryParams.get("message");
-
   useEffect(() => {
     if (message) {
       toast.success(message);
     }
   }, [message]);
+  async function fetchStudentProfile(id) {
+    try {
+      cl(id, "id from function");
+      const apiUrl = `${BaseUrl}student/StudentProfileShow/${id}/`;
+      const response = await axios.get(apiUrl);
+      console.log(response.data.data, "data from backend student profile");
+
+      // Assuming the student_id is in the response data
+      return response.data;
+    } catch (error) {
+      console.log(error, "Error during student profile show");
+      throw error; // Propagate the error to the caller
+    }
+  }
+  async function fetchTutorProfile(id) {
+    try {
+      cl(id, "id from function");
+      const apiUrl = `${BaseUrl}tutor/TutorProfileShow/${id}/`;
+      const response = await axios.get(apiUrl);
+      console.log(response.data.data, "data from backend tutor profile");
+
+      return response.data;
+    } catch (error) {
+      console.log(error, "Error during student profile show");
+      throw error;
+    }
+  }
   useEffect(() => {
     const googleAuth = async () => {
       try {
@@ -42,42 +68,75 @@ const CommonLogin = () => {
             },
           }
         );
-        const googleuser = {
+        console.log(response.given_name, "decode response");
+
+        const googleUser = {
           email: response.data.email,
-          username: response.data.name,
+          username:
+            response.data.name.length > 20
+              ? response.data.given_name
+              : response.data.name,
           password: response.data.id,
         };
+        console.log(googleUser, "user");
         try {
-          const backendresponse = await axios.post(GoogleLoginUrl, googleuser);
-          const res = backendresponse.data;
-          const token = jwtDecode(res.token.access_token);
-          console.log(token, "gfdgfdgfdgfdg");
+          const backendResponse = await axios.post(GoogleLoginUrl, googleUser);
+          const res = backendResponse.data;
+          const token = jwtDecode(res.token.access);
+
           if (res.status === 200) {
             localStorage.setItem("authToken", JSON.stringify(res.token));
-            const userSet = {
-              user_id: token.user_id,
-              name: token.username,
-              email: token.email,
-              is_admin: token.is_admin,
-              role: token.role,
-            };
-            dispatch(setUserDetails(userSet));
-            if (token.role === "student") {
-              navigate("/");
-              toast.success(res.Text);
-            } else if (token.role === "admin") {
-              navigate("/admin/");
-              toast.success(res.Text);
-            } else if (token.role === "tutor") {
-              navigate("/tutor/");
-              toast.success(res.Text);
+            try {
+              if (token.role === "tutor") {
+                const tutorProfileResponse = await fetchTutorProfile(token.id);
+                const tutor_id = tutorProfileResponse.data;
+                console.log(tutor_id, "tutor_id coming");
+                const tutorSet = {
+                  user_id: token.user_id,
+                  name: token.username,
+                  email: token.email,
+                  is_admin: token.is_admin,
+                  role: token.role,
+                  id: tutor_id,
+                };
+                dispatch(setUserDetails(tutorSet));
+              } else if (token.role === "student") {
+                const studentProfileResponse = await fetchStudentProfile(
+                  token.id
+                );
+                const student_id = studentProfileResponse.data;
+                console.log(student_id, "student_id coming");
+                const studentSet = {
+                  user_id: token.user_id,
+                  name: token.username,
+                  email: token.email,
+                  is_admin: token.is_admin,
+                  role: token.role,
+                  id: student_id,
+                };
+                dispatch(setUserDetails(studentSet));
+              }
+
+              // Navigate based on the user's role
+              if (token.role === "student") {
+                navigate("/");
+                toast.success(res.Text);
+              } else if (token.role === "admin") {
+                navigate("/admin/");
+                toast.success(res.Text);
+              } else if (token.role === "tutor") {
+                navigate("/tutor/");
+                toast.success(res.Text);
+              }
+            } catch (err) {
+              console.log(err, "Error during student profile show");
             }
           }
         } catch (error) {
-          cl("Error During Loginnnnnnn", error);
+          cl("Error During Login", error);
         }
       } catch (error) {
-        console.log(error, "Error found during Gooogle Login");
+        console.log(error, "Error found during Google Login");
       }
     };
     if (guser) {
@@ -87,6 +146,7 @@ const CommonLogin = () => {
 
   const loginWithGoogle = useGoogleLogin({
     onSuccess: (codeResponse) => {
+      console.log(codeResponse, "responsee");
       setGuser(codeResponse);
     },
     onError: (error) => {
@@ -120,6 +180,7 @@ const CommonLogin = () => {
       if (response.status === 200) {
         const data = await response.json();
         const token = jwtDecode(data.access);
+        console.log(token, "Token");
         localStorage.setItem("authToken", JSON.stringify(data));
         let apiUrl = null;
         if (token.role === "tutor") {
@@ -192,7 +253,7 @@ const CommonLogin = () => {
   return (
     <>
       {loading && <Loader />}
-      <div className="grid grid-cols-1 sm:grid-cols-2">
+      <div className="grid grid-cols-1 sm:grid-cols-2 h-screen">
         <div className="hidden sm:block">
           <img
             className="w-full h-full object-cover"

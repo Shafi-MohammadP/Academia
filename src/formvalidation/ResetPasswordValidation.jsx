@@ -1,12 +1,6 @@
 import * as Yup from "yup";
 
-export const SignupValidationSchema = Yup.object().shape({
-  username: Yup.string().required("This field is required").trim(),
-  email: Yup.string()
-    .matches(/^[\w.-]+@[\w.-]+\.\w+$/, "Please enter a valid email")
-    .email("Please enter a valid email")
-    .required("This field is required")
-    .trim(),
+export const ResetPasswordValidationSchema = Yup.object().shape({
   password: Yup.string()
     .required("This field is required")
     .min(8, "Password must be 8 or more characters")

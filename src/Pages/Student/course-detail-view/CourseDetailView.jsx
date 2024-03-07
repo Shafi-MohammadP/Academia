@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { useLocation } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import { Container, Row, Col } from "reactstrap";
 import { Button } from "@mui/material";
 import "./course-detail-view.css";
@@ -23,6 +23,7 @@ const CourseDetailView = () => {
   const user = useSelector((state) => state.user.userInfo);
   const location = useLocation();
   const course = location.state.course;
+  const navigate = useNavigate();
   const { tutor_profile } = course;
   const { id: tutorId } = tutor_profile;
   const [courseReview, setCourseReview] = useState([]);
@@ -77,13 +78,17 @@ const CourseDetailView = () => {
     //   setPurchased(true);
     // }
     return checked ? (
-      // setPurchased(true)
-      ""
+      <Button className="btn">Message Teacher</Button>
     ) : (
       <Button className="btn" onClick={() => handlePurchaseCourse(course.id)}>
         Purchase Course
       </Button>
     );
+  };
+  const handleVideoShow = (event) => {
+    navigate("video-show/", {
+      state: { videoDEtails: event },
+    });
   };
   useEffect(() => {
     const fetchCourseVideo = () => {
@@ -128,39 +133,53 @@ const CourseDetailView = () => {
             <Col lg="6" md="6">
               <div className="about__content">
                 <h2>{course.course_name}</h2>
-                <p>{course.description}</p>
+                <p className="txt">{course.description}</p>
                 <h3 className="text-black">{course.price}</h3>
 
                 <div className="about__counter">
-                  <div className="flex gap-40 align-items-center">
-                    <div className="single__counter">
-                      <p className="counter__title text-black ">
-                        <i className="ri-movie-fill"></i> {course.video_count}{" "}
-                        Videos
-                      </p>
-                    </div>
-
-                    <div className="single__counter text-black">
-                      <p className="d-flex align-items-center gap-1 text-black">
-                        <i class="ri-star-fill ml-16"></i>{" "}
-                        {course.average_rating}K
-                      </p>
-                    </div>
-                  </div>
-                  <div className="flex gap-40 align-items-center">
-                    <div className="single__counter">
-                      <p className="counter__title text-black ">
-                        <i className="ri-presentation-fill"></i>{" "}
-                        {course.tutor_profile.tutor_details.username}
-                      </p>
-                    </div>
-
-                    <div className="single__counter text-black">
-                      <p className="d-flex align-items-center gap-1 text-black ml-[4.5rem]">
-                        <i class="ri-thumb-up-fill"></i> {course.likes}
-                      </p>
-                    </div>
-                  </div>
+                  <Row className="mb-3">
+                    <Col>
+                      <div className="flex items-center">
+                        <div className="single__counter">
+                          <p className="counter__title text-black">
+                            <i className="ri-movie-fill"></i>{" "}
+                            {course.video_count} Videos
+                          </p>
+                        </div>
+                      </div>
+                    </Col>
+                    <Col>
+                      <div className="flex items-center">
+                        <div className="single__counter text-black">
+                          <p className="d-flex align-items-center gap-1 text-black">
+                            <i className="ri-star-fill ml-1"></i>{" "}
+                            {course.average_rating}K
+                          </p>
+                        </div>
+                      </div>
+                    </Col>
+                  </Row>
+                  <Row>
+                    <Col>
+                      <div className="flex items-center">
+                        <div className="single__counter">
+                          <p className="counter__title text-black">
+                            <i className="ri-presentation-fill"></i>{" "}
+                            {course.tutor_profile.tutor_details.username}
+                          </p>
+                        </div>
+                      </div>
+                    </Col>
+                    <Col>
+                      <div className="flex items-center">
+                        <div className="single__counter text-black">
+                          <p className="d-flex align-items-center gap-1 text-black">
+                            <i className="ri-thumb-up-fill"></i> {course.likes}
+                          </p>
+                        </div>
+                      </div>
+                    </Col>
+                  </Row>
                   {/* {!purchaseList.includes(course.id) ? (
                     <Button
                       className="btn"
@@ -196,6 +215,7 @@ const CourseDetailView = () => {
                             className="h-full w-96"
                             src={video_details.thumbnail_image}
                             alt="demo image"
+                            onClick={() => handleVideoShow(video_details)}
                           />
                           <FontAwesomeIcon
                             className="absolute text-black bg-white  top-[40%] left-[40%] w-10 h-10 cursor-pointer"

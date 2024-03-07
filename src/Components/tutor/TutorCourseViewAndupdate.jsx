@@ -5,7 +5,8 @@ import { useLocation, useNavigate, useParams } from "react-router-dom";
 import axios from "axios";
 import { Loader } from "../Loader/Loader";
 import { Button } from "@material-tailwind/react";
-import { config } from "../../Constants/Constants";
+import { config, ApplicationConfig } from "../../Constants/Constants";
+import "./tutor-coourse-view-and-update.css";
 import {
   Dialog,
   Card,
@@ -31,7 +32,7 @@ import Fade from "@mui/material/Fade";
 import Checkbox from "@mui/material/Checkbox";
 import FormControlLabel from "@mui/material/FormControlLabel";
 import toast from "react-hot-toast";
-import { Container } from "reactstrap";
+import { Col, Container, Row } from "reactstrap";
 import ReviewList from "../common/review-list/ReviewList";
 const style = {
   position: "absolute",
@@ -52,7 +53,6 @@ const TutorCoursesView = () => {
   });
   const location = useLocation();
   const course = location.state.course;
-  console.log(course, "tutor course");
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
   const [courseDetails, setCourseDetailView] = useState([]);
@@ -102,7 +102,7 @@ const TutorCoursesView = () => {
   const [title, setTitle] = useState("");
   const [videoDescription, setVideoDescription] = useState("");
   const [free, setFree] = useState(false);
-
+  const [paid, setPaid] = useState(false);
   let imageAddFile = null;
 
   const handleProfileImage = () => {
@@ -130,7 +130,7 @@ const TutorCoursesView = () => {
     setSelectedFile(imageAddFile);
   };
   const handleSubmit = async (value) => {
-    console.log(value);
+    console.log(value, "value");
     const tokenDataString = localStorage.getItem("authToken");
     const tokenData = JSON.parse(tokenDataString);
     const accessToken = tokenData ? tokenData.access : null;
@@ -194,10 +194,14 @@ const TutorCoursesView = () => {
   const handleCheckboxChange = (event) => {
     setFree(event.target.checked);
   };
+  //// Video Adding Function
   const handleVideoAddingSubmit = async () => {
     handleClose();
     setLoading(true);
     const apiUrl = `${BaseUrl}course/videoAdding/${course.id}/`;
+    const tokenDataString = localStorage.getItem("authToken");
+    const tokenData = JSON.parse(tokenDataString);
+    const accessToken = tokenData ? tokenData.access : null;
     const videoFormValidations = {
       video_title: title,
       video_description: videoDescription,
@@ -236,12 +240,15 @@ const TutorCoursesView = () => {
     for (const [key, value] of videoForm.entries()) {
       console.log(`${key}: ${value}`);
     }
+    console.log(ApplicationConfig, "config");
     try {
-      const response = await axios.post(apiUrl, videoForm, config);
-      console.log(
-        response.data,
-        "responseeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee"
-      );
+      const response = await axios.post(apiUrl, videoForm, {
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+          "Content-Type": "multipart/form-data",
+        },
+      });
+      console.log(response.data);
       if (response.data.status === 201) {
         setTitle("");
         setVideoDescription("");
@@ -266,12 +273,14 @@ const TutorCoursesView = () => {
   };
   // video Edit Functions
   const handleOpenModalEdit = (video_info) => {
+    console.log(video_info, "info");
     setVideoInfo({
       id: video_info.id,
       video_title: video_info.video_title,
       video_description: video_info.video_description,
       thumbnail_image: video_info.thumbnail_image,
       video: video_info.video,
+      is_free_of_charge: video_info.is_free_of_charge,
     });
     setEditVideo(!editVideo);
   };
@@ -303,7 +312,9 @@ const TutorCoursesView = () => {
     if (free) {
       EditVideoForm.append("is_free_of_charge", free);
     }
-
+    if (paid) {
+      EditVideoForm.append("is_free_of_charge", !paid);
+    }
     for (const [key, value] of EditVideoForm.entries()) {
       console.log(`${key}: ${value}`);
     }
@@ -317,6 +328,9 @@ const TutorCoursesView = () => {
         setSelectedVideo([]);
         if (free) {
           setFree(false);
+        }
+        if (paid) {
+          setPaid(false);
         }
         setChange(!change);
         console.log(response.data.message, "message");
@@ -418,398 +432,396 @@ const TutorCoursesView = () => {
   return (
     <>
       {loading && <Loader />}
-      <div>
-        <h1 className="flex text-center justify-center">Course Details View</h1>
-      </div>
-
-      {courseDetails ? (
-        <section className="container flex-grow mx-auto max-w-[1200px] border-b py-5 lg:grid lg:grid-cols-2 lg:py-10">
-          {/* image gallery */}
-
-          <div className="container mx-auto px-4">
-            {/* Your image gallery code
-             */}
-            <img
-              src={courseDetails.image}
-              alt="card-image"
-              className="w-full h-100 object-cover"
-            />
-            {/* <Button className='flex align-middle w-45 h-24' color="green">Chat</Button> */}
-          </div>
-
-          {/* description */}
-          <div className="mx-auto px-5 lg:px-5">
-            <h2 className="pt-3 text-2xl font-bold lg:pt-0">
-              Course Name : {courseDetails.course_name}
-            </h2>
-            <h2 className="pt-3 text-2xl font-bold lg:pt-0">
-              Course Description : {courseDetails.description}
-            </h2>
-
-            <h2 className="pt-3 text-2xl font-bold lg:pt-0">
-              Price : ₹ {courseDetails.price}
-            </h2>
-
-            <h2 className="pt-3 text-2xl font-bold lg:pt-0">
-              {/* Location : {employeeData.place} */}
-            </h2>
-            <h2 className="pt-3 text-2xl font-bold lg:pt-0">
-              {/* Experience : {employeeData.experience} year */}
-            </h2>
-            <p className="pt-3 text-xs font-bold lg:pt-0">
-              {/* Description : {employeeData.description}  */}
-            </p>
-            <div className="flex justify-between">
-              <Button
-                className="bg-green-900"
-                onClick={() => handleOpenModal(courseDetails)}
-              >
-                Edit Course
-              </Button>
-              <Button className="bg-blue-900" onClick={handleOpen}>
-                Add Course Video
-              </Button>
-            </div>
-            {/* <AvailableDates  empId={employeeData.id} empdetails={employeeData.charge}/> */}
-          </div>
-        </section>
-      ) : (
-        <Loader />
-      )}
-
-      <>
-        <div className="flex justify-center">
-          {videoDetails && videoDetails.length !== 0 && (
-            <div className="flex flex-col w-[88%] h-[30rem] mb-20 gap-2 p-2 border rounded-md overflow-y-auto">
-              <h2 className="text-center mb-4 text-xl font-bold text-black">
-                Course Videos
-              </h2>
-              {videoDetails.map((video_details, index) => (
-                <div className="flex gap-16 p-2 border rounded-md h-52">
-                  <div
-                    key={index}
-                    className="relative "
-                    onClick={() => handleVideoShow(video_details)}
-                  >
-                    <img
-                      className="h-full w-96"
-                      src={video_details.thumbnail_image}
-                      alt="demo image"
-                    />
-                    <FontAwesomeIcon
-                      className="absolute text-black bg-yellow-200   top-[40%] left-[40%] w-10 h-10 cursor-pointer"
-                      icon={faPlay}
-                      onClick={() => handleIsModalOpen(video_details.video)}
-                    />
-                  </div>
-                  <div className="w-4/5 bg-white">
-                    <h4
-                      className="text-black"
-                      style={{ fontWeight: "bold", fontSize: "30px" }}
-                    >
-                      {video_details.video_title}
-                    </h4>
-                    <p className="text-black" style={{ fontWeight: "bolder" }}>
-                      {video_details.video_description}
-                    </p>
-                    {video_details.is_free_of_charge ? (
-                      <p className="text-black" style={{ fontWeight: "bold" }}>
-                        Free of Cost
-                      </p>
-                    ) : (
-                      <p className="text-black">Paid</p>
-                    )}
-                  </div>
-                  <FontAwesomeIcon
-                    onClick={() => handleOpenModalEdit(video_details)}
-                    className="cursor-pointer"
-                    title="edit video details"
-                    icon={faPen}
-                  ></FontAwesomeIcon>
-                </div>
-              ))}
-            </div>
-          )}
+      <section>
+        <div>
+          <h1 className="flex text-center justify-center">
+            Course Details View
+          </h1>
         </div>
-        {isModalOpen && playVideo && (
-          <div className="fixed top-0 left-0 w-full h-full   bg-opacity-75 flex items-center justify-center backdrop-filter backdrop-blur-md">
-            <div className="relative w-3/4 h-3/4 flex justify-center items-center">
-              <FontAwesomeIcon
-                icon={faTimes}
-                className="absolute top-4 right-4 text-black cursor-pointer text-2xl"
-                onClick={handleIsModalClose}
-              />
-              {/* Add your video player component here */}
-              <iframe
-                title="video"
-                width="40%"
-                height="50%"
-                src={playVideo}
-                allowFullScreen
-              ></iframe>
-            </div>
-          </div>
-        )}
-      </>
 
-      <Dialog
-        open={open}
-        handler={handleOpenModal}
-        onClose={handleCloseModal}
-        aria-labelledby="form-dialog-title"
-        maxWidth="xs"
-      >
-        <Card>
-          <CardContent className="flex flex-wrap gap-8">
-            <Typography variant="h4" color="primary">
-              Edit Course
-            </Typography>
-            <div className="w-full flex justify-center">
-              <div className="relative">
-                {selectedFile ? (
-                  // Display the selected image if a file is selected
-                  <img
-                    src={URL.createObjectURL(selectedFile)}
-                    style={{
-                      width: "100px",
-                      height: "100px",
-                    }}
-                    alt="selected-image"
-                  />
-                ) : (
-                  // Display the user's profile photo if no file is selected
-                  <div className="relative">
-                    <img
-                      src={courseInfo.image}
-                      style={{ width: "100px", height: "100px" }}
-                      alt="profile-image"
-                    />
+        {courseDetails ? (
+          <Container className="">
+            {/* image gallery */}
+            <Row>
+              <Col lg="6" md="6">
+                <div className="about__img">
+                  <img src={courseDetails.image} alt="" className="w-100" />
+                </div>
+              </Col>
+
+              <Col lg="6" md="6">
+                <div className="mx-auto px-5 ">
+                  <p className="txt font-bold name__style">
+                    Course Name : {courseDetails.course_name}
+                  </p>
+                  <p className="txt font-bold name__style">
+                    Course Description : {courseDetails.description}
+                  </p>
+
+                  <p className="txt font-bold name__style">
+                    Price : ₹ {courseDetails.price}
+                  </p>
+                  <div className="flex justify-between">
+                    <Button
+                      className="bg-green-900"
+                      onClick={() => handleOpenModal(courseDetails)}
+                    >
+                      Edit Course
+                    </Button>
+                    <Button className="bg-blue-900" onClick={handleOpen}>
+                      Add Course Video
+                    </Button>
                   </div>
-                )}
+                  {/* <AvailableDates  empId={employeeData.id} empdetails={employeeData.charge}/> */}
+                </div>
+              </Col>
+            </Row>
+          </Container>
+        ) : (
+          <Loader />
+        )}
+
+        <>
+          <div className="flex justify-center">
+            {videoDetails && videoDetails.length !== 0 && (
+              <div className="flex flex-col w-[88%] h-[30rem] mb-20 gap-2 p-2 border rounded-md overflow-y-auto">
+                <h2 className="text-center mb-4 text-xl font-bold text-black">
+                  Course Videos
+                </h2>
+                {videoDetails.map((video_details, index) => (
+                  <div className="flex gap-16 p-2 border rounded-md h-52">
+                    <div
+                      key={index}
+                      className="relative "
+                      onClick={() => handleVideoShow(video_details)}
+                    >
+                      <img
+                        className="h-full w-96"
+                        src={video_details.thumbnail_image}
+                        alt="demo image"
+                      />
+                      <FontAwesomeIcon
+                        className="absolute text-black bg-yellow-200   top-[40%] left-[40%] w-10 h-10 cursor-pointer"
+                        icon={faPlay}
+                        onClick={() => handleIsModalOpen(video_details.video)}
+                      />
+                    </div>
+                    <div className="w-4/5 bg-white">
+                      <h4
+                        className="text-black"
+                        style={{ fontWeight: "bold", fontSize: "30px" }}
+                      >
+                        {video_details.video_title}
+                      </h4>
+                      <p
+                        className="text-black"
+                        style={{ fontWeight: "bolder" }}
+                      >
+                        {video_details.video_description}
+                      </p>
+                      {video_details.is_free_of_charge ? (
+                        <p
+                          className="text-black"
+                          style={{ fontWeight: "bold" }}
+                        >
+                          Free of Cost
+                        </p>
+                      ) : (
+                        <p className="text-black">Paid</p>
+                      )}
+                    </div>
+                    <FontAwesomeIcon
+                      onClick={() => handleOpenModalEdit(video_details)}
+                      className="cursor-pointer"
+                      title="edit video details"
+                      icon={faPen}
+                    ></FontAwesomeIcon>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+          {isModalOpen && playVideo && (
+            <div className="fixed top-0 left-0 w-full h-full   bg-opacity-75 flex items-center justify-center backdrop-filter backdrop-blur-md">
+              <div className="relative w-3/4 h-3/4 flex justify-center items-center">
                 <FontAwesomeIcon
-                  icon={faCamera}
-                  className="absolute text-black-900 bottom-0 right-0 bg-white w-full h-4 cursor-pointer"
-                  onClick={handleProfileImage}
+                  icon={faTimes}
+                  className="absolute top-4 right-4 text-black cursor-pointer text-2xl"
+                  onClick={handleIsModalClose}
                 />
+                {/* Add your video player component here */}
+                <iframe
+                  title="video"
+                  width="40%"
+                  height="50%"
+                  src={playVideo}
+                  allowFullScreen
+                ></iframe>
               </div>
             </div>
-            <>
-              {showModal && (
-                // Your modal component or file input goes here
-                // Example using a simple file input:
-                <div className="flex justify-between w-full px-10">
-                  <input type="file" onChange={handleFileChange} />
+          )}
+        </>
 
-                  <button onClick={closeModal}>
-                    {/* <FontAwesomeIcon icon={faClose} /> */}
-                    <IoCloseCircleSharp size={26} />
-                  </button>
+        <Dialog
+          open={open}
+          handler={handleOpenModal}
+          onClose={handleCloseModal}
+          aria-labelledby="form-dialog-title"
+          maxWidth="xs"
+        >
+          <Card>
+            <CardContent className="flex flex-wrap gap-8">
+              <Typography variant="h4" color="primary">
+                Edit Course
+              </Typography>
+              <div className="w-full flex justify-center">
+                <div className="relative">
+                  {selectedFile ? (
+                    // Display the selected image if a file is selected
+                    <img
+                      src={URL.createObjectURL(selectedFile)}
+                      style={{
+                        width: "100px",
+                        height: "100px",
+                      }}
+                      alt="selected-image"
+                    />
+                  ) : (
+                    // Display the user's profile photo if no file is selected
+                    <div className="relative">
+                      <img
+                        src={courseInfo.image}
+                        style={{ width: "100px", height: "100px" }}
+                        alt="profile-image"
+                      />
+                    </div>
+                  )}
+                  <FontAwesomeIcon
+                    icon={faCamera}
+                    className="absolute text-black-900 bottom-0 right-0 bg-white w-full h-4 cursor-pointer"
+                    onClick={handleProfileImage}
+                  />
                 </div>
-              )}
-              <input
-                type="file"
-                ref={fileInputProfileRef}
-                style={{ display: "none" }}
-                onChange={handleFileChange}
+              </div>
+              <>
+                {showModal && (
+                  // Your modal component or file input goes here
+                  // Example using a simple file input:
+                  <div className="flex justify-between w-full px-10">
+                    <input type="file" onChange={handleFileChange} />
+
+                    <button onClick={closeModal}>
+                      {/* <FontAwesomeIcon icon={faClose} /> */}
+                      <IoCloseCircleSharp size={26} />
+                    </button>
+                  </div>
+                )}
+                <input
+                  type="file"
+                  ref={fileInputProfileRef}
+                  style={{ display: "none" }}
+                  onChange={handleFileChange}
+                />
+              </>
+              <TextField
+                label={courseInfo.course_name}
+                type="text"
+                value={courseName}
+                onChange={(e) => setCourseName(e.target.value)}
+                name="name"
+                fullWidth
               />
-            </>
-            <TextField
-              label={courseInfo.course_name}
-              type="text"
-              value={courseName}
-              onChange={(e) => setCourseName(e.target.value)}
-              name="name"
-              fullWidth
-            />
 
-            <TextField
-              label={courseInfo.description}
-              type="text"
-              name="description"
-              value={description}
-              onChange={(e) => setDescription(e.target.value)}
-              fullWidth
-            />
-            <TextField
-              label={courseInfo.price}
-              type="number"
-              name="description"
-              value={price}
-              onChange={(e) => setPrice(e.target.value)}
-              fullWidth
-            />
-          </CardContent>
+              <TextField
+                label={courseInfo.description}
+                type="text"
+                name="description"
+                value={description}
+                onChange={(e) => setDescription(e.target.value)}
+                fullWidth
+              />
+              <TextField
+                label={courseInfo.price}
+                type="number"
+                name="description"
+                value={price}
+                onChange={(e) => setPrice(e.target.value)}
+                fullWidth
+              />
+            </CardContent>
 
-          <CardActions>
-            {/* <Button onClick={handleCloseModal} fullWidth>
+            <CardActions>
+              {/* <Button onClick={handleCloseModal} fullWidth>
               Cancel
             </Button> */}
-            <Button fullWidth onClick={() => handleSubmit(courseInfo.id)}>
-              submit
-            </Button>
-          </CardActions>
-        </Card>
-      </Dialog>
-      <Container>
-        <div className="flex justify-center items-center">
-          <h3> Course Reviews</h3>
-        </div>
-        <ReviewList courseId={course.id} />
-      </Container>
-      <>
-        <Modal
-          aria-labelledby="transition-modal-title"
-          aria-describedby="transition-modal-description"
-          open={videOpen}
-          onClose={handleClose}
-          closeAfterTransition
-          slots={{ backdrop: Backdrop }}
-          slotProps={{
-            backdrop: {
-              timeout: 500,
-            },
-          }}
-        >
-          <Fade in={videOpen}>
-            <Box sx={style}>
-              <Typography
-                id="transition-modal-title"
-                variant="h6"
-                component="h2"
-              >
-                Add Video
-              </Typography>
-              <TextField
-                label="Video Title"
-                fullWidth
-                margin="normal"
-                value={title}
-                onChange={(e) => setTitle(e.target.value)}
-              />
-              <TextField
-                label="Video Description"
-                fullWidth
-                multiline
-                rows={4}
-                margin="normal"
-                value={videoDescription}
-                onChange={(e) => setVideoDescription(e.target.value)}
-              />
-              <label htmlFor="">Thumbnail Image</label>
-              <TextField
-                type="file"
-                fullWidth
-                margin="normal"
-                onChange={handleImageChange}
-                inputProps={{ accept: "image/*" }}
-              />
-              <label htmlFor="">Upload Video</label>
-
-              <TextField
-                type="file"
-                fullWidth
-                margin="normal"
-                onChange={handleVideoChange}
-                inputProps={{ accept: "video/*" }}
-              />
-              <FormControlLabel
-                control={
-                  <Checkbox checked={free} onChange={handleCheckboxChange} />
-                }
-                label="Free"
-              />
-              <Button
-                variant="contained"
-                onClick={handleVideoAddingSubmit}
-                sx={{ mt: 2 }}
-              >
-                Save
+              <Button fullWidth onClick={() => handleSubmit(courseInfo.id)}>
+                submit
               </Button>
-            </Box>
-          </Fade>
-        </Modal>
-      </>
-      <>
-        <Modal
-          aria-labelledby="transition-modal-title"
-          aria-describedby="transition-modal-description"
-          open={editVideo}
-          onClose={handleCloseModalEdit}
-          closeAfterTransition
-          slots={{ backdrop: Backdrop }}
-          slotProps={{
-            backdrop: {
-              timeout: 500,
-            },
-          }}
-        >
-          <Fade in={editVideo}>
-            <Box sx={style}>
-              <Typography
-                id="transition-modal-title"
-                variant="h6"
-                component="h2"
-              >
-                Add Video
-              </Typography>
-              <TextField
-                label={videoInfo.video_title}
-                fullWidth
-                margin="normal"
-                value={title}
-                onChange={(e) => setTitle(e.target.value)}
-              />
-              <TextField
-                label={videoInfo.video_description}
-                fullWidth
-                multiline
-                rows={4}
-                margin="normal"
-                value={videoDescription}
-                onChange={(e) => setVideoDescription(e.target.value)}
-              />
-              <label htmlFor="">Thumbnail Image</label>
-              <TextField
-                type="file"
-                fullWidth
-                margin="normal"
-                onChange={handleImageChange}
-                inputProps={{ accept: "image/*" }}
-              />
+            </CardActions>
+          </Card>
+        </Dialog>
+        <Container>
+          <div className="flex justify-center items-center">
+            <h3> Course Reviews</h3>
+          </div>
+          <ReviewList courseId={course.id} />
+        </Container>
+        <>
+          <Modal
+            aria-labelledby="transition-modal-title"
+            aria-describedby="transition-modal-description"
+            open={videOpen}
+            onClose={handleClose}
+            closeAfterTransition
+            slots={{ backdrop: Backdrop }}
+            slotProps={{
+              backdrop: {
+                timeout: 500,
+              },
+            }}
+          >
+            <Fade in={videOpen}>
+              <Box sx={style}>
+                <Typography
+                  id="transition-modal-title"
+                  variant="h6"
+                  component="h2"
+                >
+                  Add Video
+                </Typography>
+                <TextField
+                  label="Video Title"
+                  fullWidth
+                  margin="normal"
+                  value={title}
+                  onChange={(e) => setTitle(e.target.value)}
+                />
+                <TextField
+                  label="Video Description"
+                  fullWidth
+                  multiline
+                  rows={4}
+                  margin="normal"
+                  value={videoDescription}
+                  onChange={(e) => setVideoDescription(e.target.value)}
+                />
+                <label htmlFor="">Thumbnail Image</label>
+                <TextField
+                  type="file"
+                  fullWidth
+                  margin="normal"
+                  onChange={handleImageChange}
+                  inputProps={{ accept: "image/*" }}
+                />
+                <label htmlFor="">Upload Video</label>
 
-              {selectedImage.length !== 0 ? (
-                <>
-                  <div>
-                    <p>Selected Image:</p>
-                    <img
-                      src={URL.createObjectURL(selectedImage)}
-                      alt="Selected Image"
-                      style={{ maxWidth: "100%" }}
-                    />
-                  </div>
-                </>
-              ) : (
-                <>
-                  <div>
-                    <p>Image Preview:</p>
-                    <img
-                      src={videoInfo.thumbnail_image}
-                      alt="Selected Image"
-                      style={{ maxWidth: "100%" }}
-                    />
-                  </div>
-                </>
-              )}
-              <label htmlFor="">Upload Video</label>
-              <TextField
-                type="file"
-                fullWidth
-                margin="normal"
-                onChange={handleVideoChange}
-                inputProps={{ accept: "video/*" }}
-              />
+                <TextField
+                  type="file"
+                  fullWidth
+                  margin="normal"
+                  onChange={handleVideoChange}
+                  inputProps={{ accept: "video/*" }}
+                />
 
-              {/* {selectedVideo.length !== 0 ? (
+                <FormControlLabel
+                  control={
+                    <Checkbox checked={free} onChange={handleCheckboxChange} />
+                  }
+                  label="Free"
+                />
+
+                <Button
+                  variant="contained"
+                  onClick={handleVideoAddingSubmit}
+                  sx={{ mt: 2 }}
+                >
+                  Save
+                </Button>
+              </Box>
+            </Fade>
+          </Modal>
+        </>
+        <>
+          <Modal
+            aria-labelledby="transition-modal-title"
+            aria-describedby="transition-modal-description"
+            open={editVideo}
+            onClose={handleCloseModalEdit}
+            closeAfterTransition
+            slots={{ backdrop: Backdrop }}
+            slotProps={{
+              backdrop: {
+                timeout: 500,
+              },
+            }}
+          >
+            <Fade in={editVideo}>
+              <Box sx={style}>
+                <Typography
+                  id="transition-modal-title"
+                  variant="h6"
+                  component="h2"
+                >
+                  Edit Video
+                </Typography>
+                <TextField
+                  label={videoInfo.video_title}
+                  fullWidth
+                  margin="normal"
+                  value={title}
+                  onChange={(e) => setTitle(e.target.value)}
+                />
+                <TextField
+                  label={videoInfo.video_description}
+                  fullWidth
+                  multiline
+                  rows={4}
+                  margin="normal"
+                  value={videoDescription}
+                  onChange={(e) => setVideoDescription(e.target.value)}
+                />
+                <label htmlFor="">Thumbnail Image</label>
+                <TextField
+                  type="file"
+                  fullWidth
+                  margin="normal"
+                  onChange={handleImageChange}
+                  inputProps={{ accept: "image/*" }}
+                />
+
+                {selectedImage.length !== 0 ? (
+                  <>
+                    <div>
+                      <p>Selected Image:</p>
+                      <img
+                        src={URL.createObjectURL(selectedImage)}
+                        alt="Selected Image"
+                        style={{ maxWidth: "100%" }}
+                      />
+                    </div>
+                  </>
+                ) : (
+                  <>
+                    <div>
+                      <p>Image Preview:</p>
+                      <img
+                        src={videoInfo.thumbnail_image}
+                        alt="Selected Image"
+                        style={{ maxWidth: "100%" }}
+                      />
+                    </div>
+                  </>
+                )}
+                <label htmlFor="">Upload Video</label>
+                <TextField
+                  type="file"
+                  fullWidth
+                  margin="normal"
+                  onChange={handleVideoChange}
+                  inputProps={{ accept: "video/*" }}
+                />
+
+                {/* {selectedVideo.length !== 0 ? (
                 <>
                   <div>
                     <p>Selected Video:</p>
@@ -842,23 +854,39 @@ const TutorCoursesView = () => {
                 </>
               )} */}
 
-              <FormControlLabel
-                control={
-                  <Checkbox checked={free} onChange={handleCheckboxChange} />
-                }
-                label="Free"
-              />
-              <Button
-                variant="contained"
-                onClick={handleVideoEditSubmit}
-                sx={{ mt: 2 }}
-              >
-                Save
-              </Button>
-            </Box>
-          </Fade>
-        </Modal>
-      </>
+                {videoInfo.is_free_of_charge ? (
+                  <FormControlLabel
+                    control={
+                      <Checkbox
+                        checked={paid}
+                        onChange={(e) => setPaid(e.target.checked)}
+                      />
+                    }
+                    label="Paid"
+                  />
+                ) : (
+                  <FormControlLabel
+                    control={
+                      <Checkbox
+                        checked={free}
+                        onChange={handleCheckboxChange}
+                      />
+                    }
+                    label="Free"
+                  />
+                )}
+                <Button
+                  variant="contained"
+                  onClick={handleVideoEditSubmit}
+                  sx={{ mt: 2 }}
+                >
+                  Save
+                </Button>
+              </Box>
+            </Fade>
+          </Modal>
+        </>
+      </section>
     </>
   );
 };

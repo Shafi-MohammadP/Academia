@@ -43,6 +43,7 @@ const Head = () => {
   const user = useSelector((state) => {
     if (state.user.userInfo.role === "student") return state.user.userInfo;
   });
+  console.log(user, "user");
   const menuRef = useRef();
   const navigate = useNavigate();
   const dispatch = useDispatch();
@@ -75,6 +76,10 @@ const Head = () => {
       setCategories(res.data);
       // console.log(categories, "categories");
     });
+    const tokenDataString = localStorage.getItem("authToken");
+    const tokenData = JSON.parse(tokenDataString);
+    const accessToken = tokenData ? tokenData.access : null;
+    console.log(accessToken, "  ");
   }, []);
   useEffect(() => {
     if (!user) {

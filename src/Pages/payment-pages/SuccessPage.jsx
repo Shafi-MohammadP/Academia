@@ -36,20 +36,33 @@ function SuccessPage() {
 
       const purchaseCourse = async () => {
         const apiUrl = `${BaseUrl}course/purchase_course/`;
+        const tokenDataString = localStorage.getItem("authToken");
+        const tokenData = JSON.parse(tokenDataString);
+        const accessToken = tokenData ? tokenData.access : null;
+        console.log(accessToken, "token coming");
         const data = {
           student: userId,
           course: courseId,
           tutor: tutorId,
         };
+
         try {
-          const response = await axios.post(apiUrl, data, config);
+          const response = await fetch(apiUrl, {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${accessToken}`, // Replace with your actual access token
+            },
+            body: JSON.stringify(data),
+          });
+
           if (response.status === 201) {
             setSuccess(true);
           } else {
             setSuccess(false);
           }
         } catch (err) {
-          console.error(err, "found on purchase");
+          console.error(err, "Error found on purchase");
           setSuccess(false);
         } finally {
           setLoading(false);

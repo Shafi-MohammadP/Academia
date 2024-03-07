@@ -15,6 +15,7 @@ import TutorCourses from "../../Pages/Tutor/my-courses/TutorCourses";
 import AboutUs from "../../Components/common/about-us/AboutUs";
 import CourseDetailView from "../../Pages/Student/course-detail-view/CourseDetailView";
 import TutorVideoShow from "../../Components/tutor/tutor_video_show/TutorVideoShow";
+import OtpVerificationPage from "../../Components/common/reste-password/OtpVerificationPage";
 
 const TutorRoutes = () => {
   const [user, setUser] = useState([]);
@@ -94,7 +95,13 @@ const TutorRoutes = () => {
           <Route path="/" element={<TutorLayout />}>
             <Route index element={<TutorHome />} />
             <Route path="/my-courses/*" element={<TutorCourses />} />
-            <Route path="tutorprofile" element={<TutorProfile />} />
+            <Route path="tutorprofile">
+              <Route index element={<TutorProfile />} />
+              <Route
+                path="rest-password-verification/"
+                element={<OtpVerificationPage />}
+              />
+            </Route>
             <Route path="courseView/" element={<CourseDetailView />} />
 
             <Route

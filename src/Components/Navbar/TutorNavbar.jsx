@@ -56,78 +56,7 @@ export function TutorStickyNavbar() {
   const showNavbar = () => {
     navRef.current.classList.toggle("responsive_nav");
   };
-  // const navigate = useNavigate();
-  // const dispatch = useDispatch();
-  // const [openNav, setOpenNav] = React.useState(false);
-  // const tutor = useSelector((state) => {
-  //   if (state.user.userInfo.role === "tutor") return state.user.userInfo;
-  // });
-  // React.useEffect(() => {
-  //   window.addEventListener(
-  //     "resize",
-  //     () => window.innerWidth >= 960 && setOpenNav(false)
-  //   );
-  // }, []);
-  // const profileShow = () => {
-  //   axios
-  //     .get(`http://127.0.0.1:8000/user/tutorProfile/${tutor.user_id}/`)
-  //     .then((response) => {
-  //       console.log(response.data); // Log the response data to the console
-  //     })
-  //     .catch((error) => {
-  //       console.error("Error fetching data:", error);
-  //     });
-  // };
-  // const LogoutUser = () => {
-  //   localStorage.removeItem("authToken");
-  //   dispatch(resetState());
-  //   navigate("/Login");
-  //   toast.success("Logout Success");
-  // };
 
-  // const navList = (
-  //   <ul className="mt-2 mb-4 flex flex-col gap-2 lg:mb-0 lg:mt-0 lg:flex-row lg:items-center lg:gap-6">
-  //     <Typography
-  //       as="li"
-  //       variant="small"
-  //       color="blue-gray"
-  //       className="p-1 font-normal"
-  //     >
-  //       <a href="#" className="flex items-center">
-  //         Pages
-  //       </a>
-  //     </Typography>
-  //     <Typography
-  //       onClick={() => profileShow()}
-  //       as="li"
-  //       variant="small"
-  //       color="blue-gray"
-  //       className="p-1 font-normal"
-  //     >
-  //       Account
-  //     </Typography>
-  //     <Typography
-  //       as="li"
-  //       variant="small"
-  //       color="blue-gray"
-  //       className="p-1 font-normal"
-  //     >
-  //       <a href="#" className="flex items-center">
-  //         Blocks
-  //       </a>
-  //     </Typography>
-  //     <Typography
-  //       as="li"
-  //       variant="small"
-  //       color="blue-gray"
-  //       className="p-1 font-normal"
-  //     >
-  //       <p href="#" className="flex items-center">
-  //         Docs
-  //       </p>
-  //     </Typography>
-  //   </ul>
-  // );
   useEffect(() => {
     const apiUrl = `${BaseUrl}tutor/certificate_confirmation/${tutor.id}/`;
     const fetchCertificate = async () => {
@@ -141,7 +70,9 @@ export function TutorStickyNavbar() {
   return (
     <>
       <header>
-        <img src={logo} alt="" className="h-20 px-10" />
+        <Link to={"/tutor"}>
+          <img src={logo} alt="" className="h-20 px-10" />
+        </Link>
         <nav ref={navRef}>
           <Link to={"/tutor"}>
             <a href="">Home</a>
@@ -153,13 +84,65 @@ export function TutorStickyNavbar() {
           <Link to={"about-us/"}>
             <a href="">About Us</a>
           </Link>
-          {/* <a href="/tutor/applicationform">Add Course</a> */}
+
           {certificate ? (
             <Link to={`/tutor/applicationform/`}>Add Course</Link>
           ) : (
             ""
           )}
+          <Link to={"about-us/"}>
+            {tutor ? (
+              <div className="relative">
+                <div onClick={toggleDropdown}>
+                  <i
+                    className="ri-user-line user  cursor-pointer text-2xl
+                "
+                    title="profile"
+                  ></i>
+                </div>
 
+                {/* Dropdown content */}
+                {isDropdownVisible && (
+                  <div className="absolute top-12 right-0 mt-2 bg-white border rounded shadow-md z-10 w-48">
+                    <ul>
+                      <li>
+                        <i class="ri-user-line"></i>
+                        <Link
+                          to={"/tutor/tutorprofile"}
+                          onClick={toggleDropdown}
+                          style={{ textDecoration: "None", color: "black" }}
+                        >
+                          {" "}
+                          Profile
+                        </Link>
+                      </li>
+                      <li>
+                        {/* Add your logout functionality here */}
+                        <i class="ri-logout-box-r-line"></i>
+                        <a
+                          href=""
+                          onClick={() => logoutUser()}
+                          style={{ textDecoration: "None", color: "black" }}
+                        >
+                          Log out
+                        </a>
+                      </li>
+                    </ul>
+                  </div>
+                )}
+              </div>
+            ) : (
+              <NavLink to={"/Login"}>
+                <Button
+                  variant="gradient"
+                  size="sm"
+                  className="user hidden lg:inline-block"
+                >
+                  <span>Sign in</span>
+                </Button>
+              </NavLink>
+            )}
+          </Link>
           {/* Move the Button with FontAwesome icon to the end of the nav element */}
 
           <button className="nav-btn nav-close-btn" onClick={showNavbar}>
@@ -169,67 +152,6 @@ export function TutorStickyNavbar() {
         <button className="nav-btn" onClick={showNavbar}>
           <FaBars />
         </button>
-        {/* <div className="flex items-center justify-between">
-          <Input
-            type="text"
-            placeholder="Search"
-            className="p-2 border rounded-md focus:outline-none focus:border-blue-500 w-full" // Add w-full class for full width
-          />
-        </div> */}
-
-        {tutor ? (
-          <div className="relative">
-            {/* User icon, clicking on it toggles the dropdown */}
-            <div onClick={toggleDropdown}>
-              <FontAwesomeIcon
-                icon={faUser}
-                className="user cursor-pointer w-12 h-6"
-                title="profile"
-              />
-            </div>
-
-            {/* Dropdown content */}
-            {isDropdownVisible && (
-              <div className="absolute top-12 right-0 mt-2 bg-white border rounded shadow-md z-10 w-48">
-                <ul>
-                  <li>
-                    <i class="ri-user-line"></i>
-                    <Link
-                      to={"/tutor/tutorprofile"}
-                      onClick={toggleDropdown}
-                      style={{ textDecoration: "None", color: "black" }}
-                    >
-                      {" "}
-                      Profile
-                    </Link>
-                  </li>
-                  <li>
-                    {/* Add your logout functionality here */}
-                    <i class="ri-logout-box-r-line"></i>
-                    <a
-                      href=""
-                      onClick={() => logoutUser()}
-                      style={{ textDecoration: "None", color: "black" }}
-                    >
-                      Log out
-                    </a>
-                  </li>
-                </ul>
-              </div>
-            )}
-          </div>
-        ) : (
-          <NavLink to={"/Login"}>
-            <Button
-              variant="gradient"
-              size="sm"
-              className="user hidden lg:inline-block"
-            >
-              <span>Sign in</span>
-            </Button>
-          </NavLink>
-        )}
-        {/* </div> */}
       </header>
     </>
   );

@@ -15,6 +15,7 @@ import CourseCategoryList from "../../Components/common/coursecategorybaselistin
 import PurchaseCourse from "../../Pages/Student/purchased-course/PurchaseCourse";
 import PurchaseCourseDetailsView from "../../Pages/Student/purchased-course/PurchaseCourseDetailsView";
 import PurchasedCourseVideo from "../../Pages/Student/video-show/PurchasedCourseVideo";
+import OtpVerificationPage from "../../Components/common/reste-password/OtpVerificationPage";
 // import { LoginPage } from "../../Pages/Student/Login/Login";
 // import { SignupPage } from "../../Pages/Student/Signup/Signup";
 
@@ -94,7 +95,15 @@ const StudentRoutes = () => {
           <Route element={<Userprotected />}>
             {/* <Route index element={<HeroSection />} /> */}
             <Route index element={<Home />} />
-            <Route path="studentprofile/" element={<StudentProfilePage />} />
+            <Route path="studentprofile/">
+              <Route index element={<StudentProfilePage />}></Route>
+              <Route
+                path="rest-password-verification/"
+                element={<OtpVerificationPage />}
+              >
+                {" "}
+              </Route>
+            </Route>
             <Route path="purchased-course/" element={<PurchaseCourse />} />
             <Route
               path="purchased-course/course-detail-view/"
@@ -104,10 +113,10 @@ const StudentRoutes = () => {
             <Route path="search-result/" element={<SearchCorseList />} />
             <Route path="all-courses/" element={<AllCourses />} />
             <Route path="courseCategory/" element={<CourseCategoryList />} />
-            <Route
-              path="courseCategory/courseView/"
-              element={<CourseDetailView />}
-            />
+            <Route path="courseCategory/courseView/">
+              <Route index element={<CourseDetailView />} />
+              <Route path="video-show/" element={<PurchasedCourseVideo />} />
+            </Route>
             <Route
               path="all-courses/courseView"
               element={<CourseDetailView />}
@@ -116,6 +125,8 @@ const StudentRoutes = () => {
               path="purchased-course/course-detail-view/video-show/"
               element={<PurchasedCourseVideo />}
             />
+            <Route path="video-show/" />
+
             {/* <Route path="newDemo/" element={<Head />} /> */}
           </Route>
         </Route>
